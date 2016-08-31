@@ -1,0 +1,22 @@
+---
+version: '2'
+services:
+  data-rest-test:
+    build:
+      context: ./microservices-data/data-rest-test
+      dockerfile: Dockerfile
+    ports:
+      - "9080:9080"
+    links:
+      - "redis:redis"
+    depends_on:
+      - redis
+  redis:
+    image: redis
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./microservices-service/redis.conf:/usr/local/etc/redis/redis.conf
+      # NOTE: The following will need to change most likely to a data container
+      - /data/microservices:/mnt/microservices
