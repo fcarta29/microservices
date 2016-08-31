@@ -1,0 +1,31 @@
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Eclipse Files
+.project
+.classpath
+.settings/
+.metadata/
+.metadata
+.DS_Store
+.recommenders/
+.springbeans
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# redis backup db
+*.rdb
+
+target/
+classes/
+Servers/
+bin/
+gen/
