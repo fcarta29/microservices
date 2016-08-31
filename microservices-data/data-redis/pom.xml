@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.vmware.pso.samples.microservices</groupId>
+    <artifactId>microservices-data</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>com.vmware.pso.samples.microservices.data</groupId>
+  <artifactId>data-redis</artifactId>
+  <version>${project.parent.version}</version>
+  <name>MicroServices - Data: Redis Persistence</name>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.vmware.pso.samples.microservices</groupId>    
+      <artifactId>microservices-core</artifactId>
+    </dependency>   
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-redis</artifactId>
+    </dependency>  
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+              
+    <!-- Testing -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.orange.redis-embedded</groupId>
+      <artifactId>embedded-redis</artifactId>
+    </dependency>
+
+  </dependencies> 
+</project>

@@ -1,0 +1,109 @@
+     DataCenters [{
+        "id": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4",
+        "name": "Team2 - Lab",
+        "active": true
+      }]
+      
+      Servers [{
+        "id": "e8f617a9-53a5-4c9e-a63a-7915a5a945c2",
+        "name": "Server4",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "3de053fc-f261-402a-bf34-2215c5aa2814",
+        "name": "Server2",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "28822dae-84db-462b-b343-da17fb2fc336",
+        "name": "Server7",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "016c06d9-9dd3-4c2a-a595-bbcd67104750",
+        "name": "Server6",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "278b76cc-c4e4-4573-8671-5b6c3b484af9",
+        "name": "Server8",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "34016eb9-4543-481c-91e3-385e19db1e9b",
+        "name": "Server5",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "3f206472-94dc-43e4-96b4-81a033a28f51",
+        "name": "Server1",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "204e032c-bd7a-4ae2-91c5-782e01d6b456",
+        "name": "Server3",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      },{
+        "id": "0920bff5-674d-4679-ad98-abc577ee2718",
+        "name": "Server9",
+        "active": true,
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4"
+      }]      
+       
+      Groups [{
+        "id": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb",
+        "name": "Team2",
+        "active": true
+      }]
+      
+      Users [{
+        "id": "1056d4c0-5983-4b7b-8d19-33a56aa82365",
+        "userName": "lkimmel",
+        "firstName": "Logan",
+        "lastName": "Kimmel",
+        "active": true,
+        "groupId": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb"
+      },{
+        "id": "659eaf72-1357-484b-99ff-79d14b26f367",
+        "userName": "jscarano",
+        "firstName": "Jason",
+        "lastName": "Scarano",
+        "active": true,
+        "groupId": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb"
+      },{
+        "id": "e147e017-e49d-48b2-aa10-06117a215da0",
+        "userName": "jaganthans",
+        "firstName": "Selva",
+        "lastName": "Jaganathan",
+        "active": true,
+        "groupId": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb"
+      },{
+        "id": "1beb73fb-b5d8-4cf8-b69a-d81b55e9967d",
+        "userName": "fcarta",
+        "firstName": "Frank",
+        "lastName": "Carta",
+        "active": true,
+        "groupId": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb"
+      },{
+        "id": "458937da-f5c1-47eb-8e01-17422fbc8ade",
+        "userName": "srondla",
+        "firstName": "Srinivas",
+        "lastName": "Rondla",
+        "active": true,
+        "groupId": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb"
+      }]
+      
+      Reservations [{
+        "id": "356d5938-c146-4031-9018-0c062a07589a",
+        "name": "Reservation - 1",
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4",
+        "serverId": "3f206472-94dc-43e4-96b4-81a033a28f51",
+        "groupId": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb",
+        "userId": "1beb73fb-b5d8-4cf8-b69a-d81b55e9967d",
+        "startTimestamp": 0,
+        "endTimestamp": 0,
+        "createdTimestamp": 1471983843293,
+        "modifiedTimestamp": 1471984150904,
+        "status": "WAITING"
+      }]

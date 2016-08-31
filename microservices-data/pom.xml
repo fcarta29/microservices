@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.vmware.pso.samples</groupId>
+    <artifactId>microservices</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>com.vmware.pso.samples.microservices</groupId>
+  <artifactId>microservices-data</artifactId>
+  <version>${project.parent.version}</version>
+  <packaging>pom</packaging>
+  <name>MicroServices - Data</name>
+  
+  <modules>
+    <module>data-redis</module>
+    <module>data-rest-test</module>
+  </modules>
+
+  <prerequisites>
+      <maven>3.2.5</maven>
+  </prerequisites>  
+
+  <dependencyManagement>
+    <dependencies>    
+      <dependency>
+        <!-- groupId>${project.parent.groupId}</groupId> THIS DOESNT WORK FOR SOME REASON-->      
+        <groupId>com.vmware.pso.samples.microservices</groupId>    
+        <artifactId>microservices-core</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
