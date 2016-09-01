@@ -6,6 +6,16 @@ services:
       context: ./microservices-data/data-rest-test
       dockerfile: Dockerfile
     ports:
+      - "9090:9090"
+    links:
+      - "redis:redis"
+    depends_on:
+      - redis
+  service-reservation:
+    build:
+      context: ./microservices-service/service-reservation
+      dockerfile: Dockerfile
+    ports:
       - "9080:9080"
     links:
       - "redis:redis"
