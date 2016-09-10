@@ -6,7 +6,7 @@ services:
       context: ./microservices-data/data-rest-test
       dockerfile: Dockerfile
     ports:
-      - "9090:9090"
+      - "9090:9080"
     links:
       - "redis:redis"
     depends_on:
@@ -21,12 +21,34 @@ services:
       - "redis:redis"
     depends_on:
       - redis
+  service-journal:
+    build:
+      context: ./microservices-service/service-journal
+      dockerfile: Dockerfile
+    ports:
+      - "9081:9081"
+    links:
+      - "redis:redis"
+    depends_on:
+      - redis
+  service-approval:
+    build:
+      context: ./microservices-service/service-approval
+      dockerfile: Dockerfile
+    ports:
+      - "9082:9082"
+    links:
+      - "redis:redis"
+    depends_on:
+      - redis
   redis:
     image: redis
+    ports:
+      - "6379:6379"
     command:
       - redis-server
       - /usr/local/etc/redis/redis.conf
     volumes:
       - ./microservices-service/redis.conf:/usr/local/etc/redis/redis.conf
       # NOTE: The following will need to change most likely to a data container
-      - /data/microservices:/mnt/microservices
+      - /data/microservices:/mnt/microservices:rw

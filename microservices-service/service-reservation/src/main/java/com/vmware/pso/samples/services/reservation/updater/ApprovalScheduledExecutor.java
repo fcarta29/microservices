@@ -35,7 +35,7 @@ public class ApprovalScheduledExecutor extends ScheduledThreadPoolExecutor {
 
         LOG.debug("Scheduling approval : " + approvalTask.getApprovalId());
 
-        schedule(approvalTask, 8, TimeUnit.SECONDS);
+        schedule(approvalTask, 5, TimeUnit.SECONDS);
 
         return approvalTask.getApprovalId();
     }
