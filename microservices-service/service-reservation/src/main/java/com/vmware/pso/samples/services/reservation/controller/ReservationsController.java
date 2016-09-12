@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vmware.pso.samples.core.dao.ReservationDao;
 import com.vmware.pso.samples.core.dao.ServerDao;
-import com.vmware.pso.samples.core.dto.ApprovalDto;
 import com.vmware.pso.samples.core.dto.ReservationDto;
 import com.vmware.pso.samples.core.model.Reservation;
 import com.vmware.pso.samples.core.model.Server;
@@ -48,7 +47,7 @@ public class ReservationsController extends AbstractReservationController<Reserv
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
-    final public @ResponseBody ApprovalDto create(@RequestBody final ReservationDto reservationDto) {
+    final public @ResponseBody ReservationDto create(@RequestBody final ReservationDto reservationDto) {
         // TODO[fcarta] data validation here
         final Reservation reservation = toEntity(reservationDto);
         reservation.setCreatedTimestamp(System.currentTimeMillis());
@@ -60,33 +59,26 @@ public class ReservationsController extends AbstractReservationController<Reserv
         final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(reservation);
 
         // TODO[fcarta] fix this
-        final ApprovalDto approval = new ApprovalDto();
-        approval.setId(approvalId.toString());
-        approval.setTeamId(reservation.getGroupId().toString());
-        approval.setApproved(Boolean.FALSE);
-        return approval;
+        return toDto(reservation);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
-    final public @ResponseBody ApprovalDto save(@PathVariable("id") final UUID id,
+    final public @ResponseBody ReservationDto save(@PathVariable("id") final UUID id,
             final @RequestBody ReservationDto reservationDto) {
         final Reservation persistedReservation = reservationDao.get(id);
         final Reservation reservation = toEntity(reservationDto);
-        // all reservation requests will start in waiting state when created/saved
-        reservation.setStatus(Status.WAITING);
+        // if approval not passed then reservation requests will start in waiting state when created/saved
+        reservation.setStatus(reservationDto.isApproved() ? Status.APPROVED : Status.WAITING);
         mergeEntities(persistedReservation, reservation);
         persistedReservation.setModifiedTimestamp(System.currentTimeMillis());
         reservationDao.save(persistedReservation);
 
-        // schedule reservation for approval
-        final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(persistedReservation);
+        // schedule reservation for approval only if waiting
+        if (Status.WAITING.equals(persistedReservation.getStatus())) {
+            final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(persistedReservation);
+        }
 
-        // TODO[fcarta] fix this
-        final ApprovalDto approval = new ApprovalDto();
-        approval.setId(approvalId.toString());
-        approval.setTeamId(reservation.getGroupId().toString());
-        approval.setApproved(Boolean.FALSE);
-        return approval;
+        return toDto(persistedReservation);
     }
 
     protected void mergeEntities(final Reservation persistedReservation, final Reservation reservation) {
@@ -103,6 +95,7 @@ public class ReservationsController extends AbstractReservationController<Reserv
     @Override
     protected ReservationDto toDto(final Reservation reservation) {
         final ReservationDto reservationDto = new ReservationDto();
+        reservationDto.setId(reservation.getId().toString());
         reservationDto.setName(reservation.getName());
         // find server by UUID to get name
         final Server server = serverDao.get(reservation.getServerId());
@@ -111,6 +104,7 @@ public class ReservationsController extends AbstractReservationController<Reserv
         final SimpleDateFormat df = new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
         reservationDto.setStartDate(df.format(reservation.getStartTimestamp()));
         reservationDto.setEndDate(df.format(reservation.getEndTimestamp()));
+        reservationDto.setApproved(reservation.getStatus().isApproved());
         return reservationDto;
     }
 
