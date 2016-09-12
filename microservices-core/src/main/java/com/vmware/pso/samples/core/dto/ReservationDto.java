@@ -8,6 +8,9 @@ public class ReservationDto extends AbstractDto {
 
     private static final long serialVersionUID = -8151606863232844631L;
 
+    @JsonProperty(value = "id")
+    private String id;
+
     @JsonProperty(value = "name")
     private String name;
 
@@ -19,6 +22,17 @@ public class ReservationDto extends AbstractDto {
 
     @JsonProperty(value = "end_date")
     private String endDate;
+
+    @JsonProperty(value = "approved")
+    private boolean approved;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -50,6 +64,14 @@ public class ReservationDto extends AbstractDto {
 
     public void setEndDate(final String endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(final boolean approved) {
+        this.approved = approved;
     }
 
     @Override

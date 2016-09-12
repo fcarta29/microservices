@@ -39,8 +39,7 @@ public class ApprovablesController extends AbstractApprovalController<ApprovalDt
         final ApprovalDto approvalDto = new ApprovalDto();
         // TODO[fcarta] The SoapUI tests script test assumes this is a number so UUIDs will not work - for now faking it
         // approvalDto.setId(reservation.getId().toString());
-        approvalDto.setId(String.valueOf(fakeId.incrementAndGet()));
-        System.out.println("The fake id: " + String.valueOf(fakeId.get()));
+        approvalDto.setId(fakeId.incrementAndGet());
         approvalDto.setTeamId(reservation.getGroupId().toString());
         approvalDto.setApproved(reservation.getStatus().isApproved());
         return approvalDto;

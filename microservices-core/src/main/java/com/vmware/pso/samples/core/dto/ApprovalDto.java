@@ -9,7 +9,7 @@ public class ApprovalDto extends AbstractDto {
     private static final long serialVersionUID = -2966621534126358794L;
 
     @JsonProperty(value = "id")
-    private String id;
+    private Number id;
 
     @JsonProperty(value = "teamID")
     private String teamId;
@@ -17,11 +17,11 @@ public class ApprovalDto extends AbstractDto {
     @JsonProperty(value = "approved")
     private boolean approved;
 
-    public String getId() {
+    public Number getId() {
         return id;
     }
 
-    public void setId(final String id) {
+    public void setId(final Number id) {
         this.id = id;
     }
 
