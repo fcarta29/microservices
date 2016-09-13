@@ -14,7 +14,57 @@
   <packaging>war</packaging>
   <name>MicroServices - Web Application (Web UI)</name>
 
+  <dependencies>
+    <dependency>
+      <!-- groupId>${project.parent.groupId}</groupId> THIS DOESNT WORK FOR SOME REASON-->      
+      <groupId>com.vmware.pso.samples.microservices</groupId>    
+      <artifactId>microservices-core</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>   
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jetty</artifactId>
+    </dependency>  
+
+    <!-- Apache Tiles -->
+    <dependency>
+        <groupId>org.apache.tiles</groupId>
+        <artifactId>tiles-extras</artifactId>
+    </dependency>
+  </dependencies>
+
+
   <build>
-    <finalName>microservice-webapp</finalName>
+    <finalName>microservices</finalName>
+
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.2.15.v20160210</version>
+        <configuration>
+          <scanIntervalSeconds>10</scanIntervalSeconds>
+          <!-- webApp>
+            <contextPath>/test</contextPath>
+          </webApp>
+          <loginServices>
+            <loginService implementation="org.eclipse.jetty.security.HashLoginService">
+              <name>Test Realm</name>
+              <config>${project.basedir}/src/etc/realm.properties</config>
+            </loginService>
+          </loginServices-->
+        </configuration>
+      </plugin>
+    </plugins>    
   </build>
 </project>
