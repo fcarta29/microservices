@@ -14,12 +14,12 @@
     });
 
     function connect() {
-        var socket = new SockJS('http://localhost:8080/microservices');
+        var socket = new SockJS('http://localhost:9080/reservations');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function(frame) {
             setConnected(true);
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/reservations/update', function(update){
+            stompClient.subscribe('/topic/updates', function(update){
                 updateReservation(JSON.parse(update.body));
             });
         });
@@ -41,9 +41,9 @@
             
             $.get("http://localhost:9080/api/reservations", function(reservations) {
                 console.log('Getting reservations');
-                $.each(placements, function(index, reservation) {
+                $.each(reservations, function(index, reservation) {
                     console.log('Reservation: ' + reservation);
-                    updateReservation(reservations);
+                    updateReservation(reservation);
                 });
             });
         } else {
