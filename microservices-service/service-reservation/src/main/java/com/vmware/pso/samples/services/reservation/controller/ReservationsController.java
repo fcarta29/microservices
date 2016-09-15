@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.xml.bind.DatatypeConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,7 @@ public class ReservationsController extends AbstractReservationController<Reserv
         return toDto(reservationDao.get(id));
     }
 
+    @SendTo(value = { "/topic/updates" })
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     final public @ResponseBody ReservationDto create(@RequestBody final ReservationDto reservationDto) {
         // TODO[fcarta] data validation here
@@ -62,6 +64,7 @@ public class ReservationsController extends AbstractReservationController<Reserv
         return toDto(reservation);
     }
 
+    @SendTo(value = { "/topic/updates" })
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
     final public @ResponseBody ReservationDto save(@PathVariable("id") final UUID id,
             final @RequestBody ReservationDto reservationDto) {

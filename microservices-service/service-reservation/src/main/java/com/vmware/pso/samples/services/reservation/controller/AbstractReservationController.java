@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.vmware.pso.samples.core.dto.AbstractDto;
 import com.vmware.pso.samples.core.model.AbstractUUIDEntity;
 
+@CrossOrigin(origins = "http://localhost:8080")
 public abstract class AbstractReservationController<D extends AbstractDto, E extends AbstractUUIDEntity> {
 
     protected static final UUID DEFAULT_DATACENTER_ID = UUID.fromString("aefd7ed1-7393-41a5-9ccf-311fca0b62d4");

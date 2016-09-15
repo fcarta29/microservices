@@ -37,6 +37,8 @@
 		<!-- Apache Commons -->
 		<apache-common-lang-version>3.4</apache-common-lang-version>
 		<apache-commons-collections-version>4.0</apache-commons-collections-version>
+		<!-- Apache Tiles -->
+        <apache-tiles-version>3.0.5</apache-tiles-version>
 
 		<!-- Logging -->
 		<log4j-version>2.2</log4j-version>
@@ -90,6 +92,13 @@
 				<artifactId>jackson-annotations</artifactId>
 				<version>${jackson-version}</version>
 			</dependency>			
+
+            <!-- Apache Tiles -->
+            <dependency>
+                <groupId>org.apache.tiles</groupId>
+                <artifactId>tiles-extras</artifactId>
+                <version>${apache-tiles-version}</version>
+            </dependency>
 
 			<!-- Testing -->
 			<dependency>
