@@ -16,7 +16,14 @@ To run:
 ```
 docker-compose up
 ```
-_*Note: only the data-rest-test services is currently implemented_
+_*Note: This command will run using the cached docker images. You need to add --build to regenerate the docker images with new changes
+```
+docker-compose up --build
+```
+To run by service type - for example start up redis :
+```
+docker-compose up redis
+```
 
 Swagger documentation:
 `http://{docker_host}:9080/swagger-ui.html`
