@@ -25,5 +25,34 @@ To run by service type - for example start up redis :
 docker-compose up redis
 ```
 
+### Data 
+To test basic CRUD for the data backend
+```
+docker-compose up data-rest-test
+```
+Swagger documentation:
+`http://{docker_host}:9090/swagger-ui.html`
+
+### Reservation Service
+Reservation services for making and listing reservations
+```
+docker-compose up service-reservation
+```
 Swagger documentation:
 `http://{docker_host}:9080/swagger-ui.html`
+
+### Journal Service
+Journal service for messaging ... not really used :)
+```
+docker-compose up service-journal
+```
+Swagger documentation:
+`http://{docker_host}:9081/swagger-ui.html`
+
+### Approval Service
+Approval Service for making and listing approvals of reservation requests
+```
+docker-compose up service-approval
+```
+Swagger documentation:
+`http://{docker_host}:9082/swagger-ui.html`
