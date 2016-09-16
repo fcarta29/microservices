@@ -3,6 +3,12 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+# SoapUI
+Basic_Fuction_Suite-*
+soapui-errors.log
+soapui.log
+global-groovy.log
+
 # Package Files #
 *.jar
 *.war
