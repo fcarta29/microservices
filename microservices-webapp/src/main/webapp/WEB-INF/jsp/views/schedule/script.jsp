@@ -14,7 +14,7 @@
     });
 
     function connect() {
-        var socket = new SockJS('http://localhost:9080/reservations');
+        var socket = new SockJS('http://localhost:8080/microservices');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function(frame) {
             setConnected(true);
