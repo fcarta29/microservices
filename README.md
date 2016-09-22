@@ -5,7 +5,7 @@ _*Note: all commands assume repo directory for working dir_
 
 Requirements:
 * docker
-  * Make sure to add the `/data` directory to the list of directories that 
+  * Make sure to add the `/data` directory to the list of directories that
   can be bind mounted into Docker containers,
 
 To build all the targets:
@@ -16,7 +16,7 @@ To run:
 ```
 docker-compose up
 ```
-_*Note: This command will run using the cached docker images. You need to add --build to regenerate the docker images with new changes
+_*Note:_ This command will run using the cached docker images. You need to add --build to regenerate the docker images with new changes
 ```
 docker-compose up --build
 ```
@@ -25,7 +25,7 @@ To run by service type - for example start up redis :
 docker-compose up redis
 ```
 
-### Data 
+### Data
 To test basic CRUD for the data backend
 ```
 docker-compose up data-rest-test
@@ -65,3 +65,20 @@ docker-compose up webapp
 Web UI
 `http://{docker_host}:8080
 _*Click connect to get reservation listtings and enable realtime updates
+
+### Test
+To create the SoapUI testing Docker image:
+```
+docker build -t soaptest --rm -f test/Dockerfile-soapUI .
+```
+To run the SoapUI tests:
+1. Get the gateway for your service:
+```
+gateway=$(docker inspect \
+  --format='{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' \
+microservices_service-approval_1)
+```
+2. Run the tests, passing in your retrieved gateway var:
+```
+docker run --rm -e SERVICE=${gateway} soaptest
+```
