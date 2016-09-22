@@ -56,3 +56,12 @@ docker-compose up service-approval
 ```
 Swagger documentation:
 `http://{docker_host}:9082/swagger-ui.html`
+
+### Microservices Webapp
+Microservices Webapp that serves as front end for service consumption (Currently only Reservation scheduling)
+```
+docker-compose up webapp
+```
+Web UI
+`http://{docker_host}:8080
+_*Click connect to get reservation listtings and enable realtime updates
