@@ -2,6 +2,7 @@ package com.vmware.pso.samples.web;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -14,7 +15,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
  */
 @Configuration
 @ComponentScan("com.vmware.pso.samples.web")
-// @PropertySource({ "classpath:/websocket.properties" })
+@PropertySource({ "classpath:/websocket.properties" })
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
@@ -27,6 +28,6 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
         // TODO[fcarta] for now allow all - needed since seperate apps cause CORS errors
-        registry.addEndpoint("/microservices").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/microservices-websocket-stomp").setAllowedOrigins("*").withSockJS();
     }
 }
