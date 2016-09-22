@@ -14,7 +14,7 @@
     });
 
     function connect() {
-        var socket = new SockJS('http://localhost:9080/reservations');
+        var socket = new SockJS('/microservices-websocket-stomp');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function(frame) {
             setConnected(true);
@@ -52,7 +52,7 @@
         $('#response').html('');            
     }
 
-    function updateReservation(reservation) {        
+    function updateReservation(reservation) {
         var response = $('#response');
         var p = document.createElement('p');
         p.style.wordWrap = 'break-word';
