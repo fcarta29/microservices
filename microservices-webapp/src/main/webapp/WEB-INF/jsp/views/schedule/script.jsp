@@ -1,7 +1,9 @@
+<script src="/js/fullcalendar.min.js"></script>
+
 <script type="text/javascript">
     var stompClient = null;
     
-    $(function() {
+    $(document).ready(function() {
         $('#reservationsDiv').hide();
         
         $("#connect").click(function() {
@@ -10,8 +12,89 @@
         
         $("#disconnect").click(function() {
             disconnect();
-        })          
+        }) 
+
+        $('#calendarDiv').fullCalendar({
+            height: 450,
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,basicWeek,basicDay'
+            },            
+            defaultView: 'basicWeek',
+            views: {
+                agendaWeek: {
+                    groupByResource: true
+                },
+                basicWeek: {
+                    groupByResource: true
+                }
+            },
+            editable: true,
+            events: [{
+                id: "event1",
+                title: 'Server 1 - User 1',
+                start: '2016-09-20T00:00:00.000Z',
+                end: '2016-09-23T00:00:00.000Z',
+                allDay: true,
+                color: "orange",
+                resources: ['server1']
+            },{
+                id: "event2",
+                title: 'Server 2 - User 2',
+                start: '2016-09-22T00:00:00.000Z',
+                end: '2016-09-24T00:00:00.000Z',
+                allDay: true,
+                color: "blue",
+                resourceEditable: true,
+                resources: ['server2']
+            },{
+                id: "event3",
+                title: 'Server 3 - User 3',
+                start: '2016-09-23T00:00:00.000Z',
+                end: '2016-09-24T00:00:00.000Z',
+                allDay: true,
+                color: "green",
+                resources: ['server3']
+            },{
+                id: "event4",
+                title: 'Server 4 - User 4',
+                start: '2016-09-23T00:00:00.000Z',
+                end: '2016-09-24T00:00:00.000Z',
+                allDay: true,
+                color: "red",
+                resources: ['server4']
+            }],
+            eventDrop: function(event, delta, revertFunc) {updateServerReservation(event);
+            },
+            eventResize: function(event, delta, revertFunc) {updateServerReservation(event);
+            },
+            resourceColumns: [{
+                labelText: 'Server',
+                field: 'title',
+                group: true
+            }],
+            resources: [
+                { 
+                    id: 'server1',
+                    title: 'Server 1',
+                },{ 
+                    id: 'server2',
+                    title: 'Server 2'
+                },{ 
+                    id: 'server3',
+                    title: 'Server 3'
+                },{ 
+                    id: 'server4',
+                    title: 'Server 4'
+                }
+            ]
+        });         
     });
+
+    function updateServerReservation(event) {
+        confirm("Send Server Reservation update? " + event.title + " " + event.start.format() + " " + event.end.format());
+    }
 
     function connect() {
         var socket = new SockJS('/microservices-websocket-stomp');

@@ -9,6 +9,7 @@
 	</div>
 	<div class="page-header">
 
+		<div id="calendarDiv"></div>
 		<div id="reservationsDiv">
 			<p id="response"></p>
 		</div>

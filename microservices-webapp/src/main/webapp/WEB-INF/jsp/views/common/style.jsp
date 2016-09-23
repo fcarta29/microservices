@@ -4,6 +4,8 @@
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.min.css">
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui.structure.min.css">
 
+<link rel="stylesheet" type="text/css" href="/css/fullcalendar.min.css">
+
 <style>
 
 
