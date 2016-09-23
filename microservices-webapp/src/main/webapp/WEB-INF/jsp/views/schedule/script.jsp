@@ -1,19 +1,12 @@
 <script src="/js/fullcalendar.min.js"></script>
 
 <script type="text/javascript">
-    var stompClient = null;
-    
-    $(document).ready(function() {
-        $('#reservationsDiv').hide();
-        
-        $("#connect").click(function() {
-            connect();
-        })
-        
-        $("#disconnect").click(function() {
-            disconnect();
-        }) 
 
+    $(document).ready(function() {
+
+        $("#startDatepicker").datepicker();
+        $("#endDatepicker").datepicker();
+        
         $('#calendarDiv').fullCalendar({
             height: 450,
             header: {
@@ -89,62 +82,89 @@
                     title: 'Server 4'
                 }
             ]
-        });         
-    });
+        });  
 
-    function updateServerReservation(event) {
-        confirm("Send Server Reservation update? " + event.title + " " + event.start.format() + " " + event.end.format());
+        $("#submitReservationBtn").click(function() {
+            var newReservation = {
+                user: $('#usersList').val(),
+                start: $("#startDatepicker").val(),
+                end: $("#endDatepicker").val(),
+                server: $('#serversList').val()
+            };
+            alert("TODO[fcarta] - Sending: " + JSON.stringify(newReservation));
+        })
+
+        getUsers();
+        getServers();
+        getReservations();
+    });
+    
+    function stompSubscribeHandlers() {
+        stompClient.subscribe('/topic/updates', function(update){
+            updateReservation(JSON.parse(update.body));
+        });
     }
 
-    function connect() {
-        var socket = new SockJS('/microservices-websocket-stomp');
-        stompClient = Stomp.over(socket);
-        stompClient.connect({}, function(frame) {
-            setConnected(true);
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/updates', function(update){
-                updateReservation(JSON.parse(update.body));
+    function stompUnsubscribeHandlers() {
+        stompClient.unsubscribe('/topic/updates');
+    }
+
+    function getUsers() {
+        $.get("http://localhost:9080/api/users", function(users) {
+            console.log('Getting users');
+            $.each(users, function(index, user) {
+                console.log('User: ' + user.name);
+                updateUser(user);
             });
         });
     }
 
-    function disconnect() {
-        if (stompClient != null) {
-            stompClient.disconnect();
-        }
-        setConnected(false);
-        console.log("Disconnected");
+    function getServers() {
+        $.get("http://localhost:9080/api/servers", function(servers) {
+            console.log('Getting servers');
+            $.each(servers, function(index, server) {
+                console.log('Server: ' + server.name);
+                updateServer(server);
+            });
+        });
     }
 
-    function setConnected(connected) {
-        $('#connect').prop('disabled',connected);
-        $('#disconnect').prop('disabled',!connected);
-        if (connected) {
-            $('#reservationsDiv').show();
-            
-            $.get("http://localhost:9080/api/reservations", function(reservations) {
-                console.log('Getting reservations');
-                $.each(reservations, function(index, reservation) {
-                    console.log('Reservation: ' + reservation);
-                    updateReservation(reservation);
-                });
+    function getReservations() {        
+        $.get("http://localhost:9080/api/reservations", function(reservations) {
+            console.log('Getting reservations');
+            $.each(reservations, function(index, reservation) {
+                console.log('Reservation: ' + reservation.id);
+                updateReservation(reservation);
             });
-        } else {
-            $('#reservationsDiv').hide();
-        }
-        $('#response').html('');            
+        });
+    }
+
+    function updateServerReservation(event) {
+        confirm("Send Server Reservation update? " + event.title + " " + event.start.format() + " " + event.end.format());
+    }    
+
+    function updateUser(user) {
+        $('#usersList').append($("<option></option>")
+                .attr("value",user.name)
+                .text(user.name));
+    }
+
+    function updateServer(server) {
+        $('#serversList').append($("<option></option>")
+                .attr("value",server.name)
+                .text(server.name));
     }
 
     function updateReservation(reservation) {
-        var response = $('#response');
-        var p = document.createElement('p');
-        p.style.wordWrap = 'break-word';
-        p.appendChild(document.createTextNode(reservation.id 
-                + ", " + reservation.name
-                + ", " + reservation.server_name
-                + ", " + reservation.start_date
-                + ", " + reservation.end_date
-                + ", " + reservation.approved));
-        response.append(p);
-    }        
+        //var response = $('#response');
+        //var p = document.createElement('p');
+        //p.style.wordWrap = 'break-word';
+        //p.appendChild(document.createTextNode(reservation.id 
+        //        + ", " + reservation.name
+        //        + ", " + reservation.server_name
+        //        + ", " + reservation.start_date
+        //        + ", " + reservation.end_date
+        //        + ", " + reservation.approved));
+        //response.append(p);
+    }
 </script>
