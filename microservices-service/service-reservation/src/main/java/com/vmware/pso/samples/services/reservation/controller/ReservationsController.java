@@ -8,7 +8,7 @@ import java.util.UUID;
 import javax.xml.bind.DatatypeConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +37,9 @@ public class ReservationsController extends AbstractReservationController<Reserv
     @Autowired
     private ServerDao serverDao;
 
+    @Autowired
+    private RedisTemplate<String, ReservationDto> redisTemplate;
+
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     final public @ResponseBody Collection<ReservationDto> getList() {
         return toDtoList(reservationDao.list());
@@ -47,7 +50,6 @@ public class ReservationsController extends AbstractReservationController<Reserv
         return toDto(reservationDao.get(id));
     }
 
-    @SendTo(value = { "/topic/updates" })
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     final public @ResponseBody ReservationDto create(@RequestBody final ReservationDto reservationDto) {
         // TODO[fcarta] data validation here
@@ -60,11 +62,9 @@ public class ReservationsController extends AbstractReservationController<Reserv
         // schedule reservation for approval
         final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(reservation);
 
-        // TODO[fcarta] fix this
         return toDto(reservation);
     }
 
-    @SendTo(value = { "/topic/updates" })
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
     final public @ResponseBody ReservationDto save(@PathVariable("id") final UUID id,
             final @RequestBody ReservationDto reservationDto) {
@@ -81,7 +81,13 @@ public class ReservationsController extends AbstractReservationController<Reserv
             final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(persistedReservation);
         }
 
-        return toDto(persistedReservation);
+        final ReservationDto returnReservationDto = toDto(persistedReservation);
+        if (Status.APPROVED.equals(persistedReservation.getStatus())) {
+            // notify of the approved update
+            redisTemplate.convertAndSend("/reservation/updates", returnReservationDto);
+        }
+
+        return returnReservationDto;
     }
 
     protected void mergeEntities(final Reservation persistedReservation, final Reservation reservation) {
