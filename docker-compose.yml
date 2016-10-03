@@ -41,6 +41,16 @@ services:
       - "redis:redis"
     depends_on:
       - redis
+  webapp:
+    build:
+      context: ./microservices-webapp
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    links:
+      - "redis:redis"
+    depends_on:
+      - redis      
   redis:
     image: redis
     ports:
