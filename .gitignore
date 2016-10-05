@@ -33,6 +33,7 @@ hs_err_pid*
 
 # redis backup db
 *.rdb
+!microservices-data/data-rest-test/dump.rdb
 
 target/
 classes/
