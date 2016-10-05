@@ -1,5 +1,8 @@
 package com.vmware.pso.samples.services.reservation.controller;
 
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +23,15 @@ public abstract class AbstractReservationController<D extends AbstractDto, E ext
     protected static final UUID DEFAULT_USER_ID = UUID.fromString("1beb73fb-b5d8-4cf8-b69a-d81b55e9967d");
 
     protected static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
+    protected long getStartOfMonthInEpochMilli(final ZonedDateTime zonedDateTime) {
+        return zonedDateTime.withDayOfMonth(1).with(LocalTime.MIN).toInstant().toEpochMilli();
+    }
+
+    protected long getEndOfMonthInEpochMilli(final ZonedDateTime zonedDateTime) {
+        return zonedDateTime.withDayOfMonth(YearMonth.now().lengthOfMonth()).with(LocalTime.MAX).toInstant()
+                .toEpochMilli();
+    }
 
     protected List<D> toDtoList(final Collection<E> entities) {
         if (CollectionUtils.isEmpty(entities)) {

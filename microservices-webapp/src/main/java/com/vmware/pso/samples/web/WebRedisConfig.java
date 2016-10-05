@@ -15,7 +15,8 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import com.vmware.pso.samples.core.dto.ReservationDto;
-import com.vmware.pso.samples.web.reciever.WebReceiver;
+import com.vmware.pso.samples.web.reciever.ReservationDeleteReceiver;
+import com.vmware.pso.samples.web.reciever.ReservationUpdateReceiver;
 
 @Configuration
 @ComponentScan("com.vmware.pso.samples.web")
@@ -35,15 +36,31 @@ public class WebRedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(final WebReceiver receiver) {
-        final MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(receiver, "receiveMessage");
+    public MessageListenerAdapter reservationUpdateListenerAdapter(
+            final ReservationUpdateReceiver reservationUpdateReceiver) {
+        final MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(reservationUpdateReceiver,
+                "receiveMessage");
         messageListenerAdapter.setSerializer(new Jackson2JsonRedisSerializer<ReservationDto>(ReservationDto.class));
         return messageListenerAdapter;
     }
 
     @Bean
-    WebReceiver receiver(final CountDownLatch latch) {
-        return new WebReceiver(latch);
+    public MessageListenerAdapter reservationDeleteListenerAdapter(
+            final ReservationDeleteReceiver reservationDeleteReceiver) {
+        final MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(reservationDeleteReceiver,
+                "receiveMessage");
+        messageListenerAdapter.setSerializer(new Jackson2JsonRedisSerializer<ReservationDto>(ReservationDto.class));
+        return messageListenerAdapter;
+    }
+
+    @Bean
+    ReservationUpdateReceiver reservationUpdateReceiver(final CountDownLatch latch) {
+        return new ReservationUpdateReceiver(latch);
+    }
+
+    @Bean
+    ReservationDeleteReceiver reservationDeleteReceiver(final CountDownLatch latch) {
+        return new ReservationDeleteReceiver(latch);
     }
 
     @Bean
@@ -53,12 +70,13 @@ public class WebRedisConfig {
 
     @Bean
     public RedisMessageListenerContainer container(final RedisConnectionFactory connectionFactory,
-            final MessageListenerAdapter listenerAdapter) {
+            final MessageListenerAdapter reservationUpdateListenerAdapter,
+            final MessageListenerAdapter reservationDeleteListenerAdapter) {
 
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new PatternTopic("/reservation/updates"));
-
+        container.addMessageListener(reservationUpdateListenerAdapter, new PatternTopic("/reservation/updates"));
+        container.addMessageListener(reservationDeleteListenerAdapter, new PatternTopic("/reservation/deletes"));
         return container;
     }
 }

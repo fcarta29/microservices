@@ -8,8 +8,19 @@ public class ServerDto extends AbstractDto {
 
     private static final long serialVersionUID = -557793667337515271L;
 
+    @JsonProperty(value = "id")
+    private String id;
+
     @JsonProperty(value = "name")
     private String name;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
