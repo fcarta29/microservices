@@ -14,7 +14,7 @@
                 center: 'title',
                 right: 'month,basicWeek,basicDay'
             },            
-            defaultView: 'basicWeek',
+            defaultView: 'month',
             views: {
                 agendaWeek: {
                     groupByResource: true
@@ -24,64 +24,21 @@
                 }
             },
             editable: true,
-            events: [{
-                id: "event1",
-                title: 'Server 1 - User 1',
-                start: '2016-09-20T00:00:00.000Z',
-                end: '2016-09-23T00:00:00.000Z',
-                allDay: true,
-                color: "orange",
-                resources: ['server1']
-            },{
-                id: "event2",
-                title: 'Server 2 - User 2',
-                start: '2016-09-22T00:00:00.000Z',
-                end: '2016-09-24T00:00:00.000Z',
-                allDay: true,
-                color: "blue",
-                resourceEditable: true,
-                resources: ['server2']
-            },{
-                id: "event3",
-                title: 'Server 3 - User 3',
-                start: '2016-09-23T00:00:00.000Z',
-                end: '2016-09-24T00:00:00.000Z',
-                allDay: true,
-                color: "green",
-                resources: ['server3']
-            },{
-                id: "event4",
-                title: 'Server 4 - User 4',
-                start: '2016-09-23T00:00:00.000Z',
-                end: '2016-09-24T00:00:00.000Z',
-                allDay: true,
-                color: "red",
-                resources: ['server4']
-            }],
-            eventDrop: function(event, delta, revertFunc) {updateServerReservation(event);
+            events: function(start, end, timezone, callback) {
+            	getSchedule(start,end,callback);
             },
-            eventResize: function(event, delta, revertFunc) {updateServerReservation(event);
+            eventDrop: function(event, delta, revertFunc) {
+            	updateServerReservation(event);
+            },
+            eventResize: function(event, delta, revertFunc) {
+            	updateServerReservation(event);
             },
             resourceColumns: [{
                 labelText: 'Server',
                 field: 'title',
                 group: true
             }],
-            resources: [
-                { 
-                    id: 'server1',
-                    title: 'Server 1',
-                },{ 
-                    id: 'server2',
-                    title: 'Server 2'
-                },{ 
-                    id: 'server3',
-                    title: 'Server 3'
-                },{ 
-                    id: 'server4',
-                    title: 'Server 4'
-                }
-            ]
+            resources: []
         });  
 
         $("#submitReservationBtn").click(function() {
@@ -96,7 +53,6 @@
 
         getUsers();
         getServers();
-        getReservations();
     });
     
     function stompSubscribeHandlers() {
@@ -129,13 +85,23 @@
         });
     }
 
-    function getReservations() {        
-        $.get("http://localhost:9080/api/reservations", function(reservations) {
-            console.log('Getting reservations');
-            $.each(reservations, function(index, reservation) {
-                console.log('Reservation: ' + reservation.id);
-                updateReservation(reservation);
+    function getSchedule(start,end,callback) {
+    	var queryString = "";
+    	if (typeof start !== 'undefined') {
+    		queryString += "?start="+start;
+    		if (typeof end !== 'undefined') {
+    			queryString += "&end="+end;	
+    		}
+    	}
+        $.get("http://localhost:9080/api/schedule" + queryString, function(schedule) {
+            console.log('Getting schedule');
+            
+            $.each(schedule.events, function(index, event) {
+                console.log('Event: ' + event.id);
+               // $('#calendarDiv').fullCalendar('addEvent', event);
             });
+            
+            callback(schedule.events);
         });
     }
 
@@ -154,7 +120,7 @@
                 .attr("value",server.name)
                 .text(server.name));
     }
-
+    
     function updateReservation(reservation) {
         //var response = $('#response');
         //var p = document.createElement('p');

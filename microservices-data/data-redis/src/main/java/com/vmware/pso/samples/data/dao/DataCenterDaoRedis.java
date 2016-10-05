@@ -21,7 +21,7 @@ public class DataCenterDaoRedis extends AbstractDaoRedis<DataCenter> implements 
 
     @Autowired
     @Qualifier("dataCenterRedisTemplate")
-    private final RedisTemplate<String, DataCenter> redisTemplate = new RedisTemplate<String, DataCenter>();
+    private RedisTemplate<String, DataCenter> redisTemplate;
 
     @Override
     public String getObjectKey() {

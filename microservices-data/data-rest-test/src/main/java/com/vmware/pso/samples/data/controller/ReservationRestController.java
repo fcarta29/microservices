@@ -1,7 +1,14 @@
 package com.vmware.pso.samples.data.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vmware.pso.samples.core.dao.Dao;
@@ -19,6 +26,35 @@ public class ReservationRestController extends AbstractRestController<Reservatio
     @Override
     protected Dao<Reservation> getDao() {
         return reservationDao;
+    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
+    final public @ResponseBody Collection<Reservation> searchReservations(
+            @RequestParam(required = false) final Long startTimestamp,
+            @RequestParam(required = false) final Long endTimestamp) {
+        final Collection<Reservation> reservations = new ArrayList<Reservation>();
+
+        if (startTimestamp != null && endTimestamp != null) {
+            final Collection<Reservation> foundReservations = reservationDao.findByDateRange(startTimestamp,
+                    endTimestamp);
+            if (CollectionUtils.isNotEmpty(foundReservations)) {
+                reservations.addAll(foundReservations);
+            }
+        } else if (startTimestamp != null && endTimestamp == null) {
+            final Collection<Reservation> foundReservations = reservationDao.findByDateRange(startTimestamp,
+                    Long.MAX_VALUE);
+            if (CollectionUtils.isNotEmpty(foundReservations)) {
+                reservations.addAll(foundReservations);
+            }
+        } else if (startTimestamp == null && endTimestamp != null) {
+            final Collection<Reservation> foundReservations = reservationDao.findByDateRange(Long.MIN_VALUE,
+                    endTimestamp);
+            if (CollectionUtils.isNotEmpty(foundReservations)) {
+                reservations.addAll(foundReservations);
+            }
+        }
+
+        return reservations;
     }
 
     @Override

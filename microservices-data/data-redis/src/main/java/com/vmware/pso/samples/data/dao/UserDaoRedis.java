@@ -10,27 +10,27 @@ import com.vmware.pso.samples.core.dao.UserDao;
 import com.vmware.pso.samples.core.model.User;
 
 @Repository("userDao")
-public class UserDaoRedis extends AbstractDaoRedis<User> implements UserDao { 
-    
+public class UserDaoRedis extends AbstractDaoRedis<User> implements UserDao {
+
     private static final String OBJECT_KEY = "User";
-    
-    @Bean(name="userRedisTemplate")
-    public RedisTemplate<String,User> redisTemplate() {
+
+    @Bean(name = "userRedisTemplate")
+    public RedisTemplate<String, User> redisTemplate() {
         return initRedisTemplate();
-    }    
-    
+    }
+
     @Autowired
     @Qualifier("userRedisTemplate")
-    private RedisTemplate<String,User> redisTemplate = new RedisTemplate<String,User>();
-    
+    private RedisTemplate<String, User> redisTemplate;
+
     @Override
     public String getObjectKey() {
         return OBJECT_KEY;
     }
-    
+
     @Override
-    public RedisTemplate<String,User> getRedisTemplate() {
-    	return redisTemplate;
-    }    
-    
+    public RedisTemplate<String, User> getRedisTemplate() {
+        return redisTemplate;
+    }
+
 }

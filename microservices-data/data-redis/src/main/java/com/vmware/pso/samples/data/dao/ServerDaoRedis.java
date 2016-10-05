@@ -27,7 +27,11 @@ public class ServerDaoRedis extends AbstractDaoRedis<Server> implements ServerDa
 
     @Autowired
     @Qualifier("serverRedisTemplate")
-    private final RedisTemplate<String, Server> redisTemplate = new RedisTemplate<String, Server>();
+    private RedisTemplate<String, Server> redisTemplate;
+
+    @Autowired
+    @Qualifier("redisIndexingTemplate")
+    private RedisTemplate<String, String> redisIndexingTemplate;
 
     @Override
     public String getObjectKey() {
@@ -42,24 +46,32 @@ public class ServerDaoRedis extends AbstractDaoRedis<Server> implements ServerDa
     @Override
     protected void setIndexes(final Server server) {
         // Override to set custom keys for lookup
-        initRedisTemplate().opsForSet()
-                .add(MessageFormat.format(SERVER_NAME_INDEX_KEY, server.getDataCenterId(), server.getName()), server);
+        redisIndexingTemplate.opsForSet().add(
+                MessageFormat.format(SERVER_NAME_INDEX_KEY, server.getDataCenterId(), server.getName()),
+                server.getId().toString());
+    }
+
+    @Override
+    protected void clearIndexes(final Server server) {
+        redisIndexingTemplate.opsForSet().remove(
+                MessageFormat.format(SERVER_NAME_INDEX_KEY, server.getDataCenterId(), server.getName()),
+                server.getId().toString());
     }
 
     @Override
     public Server findByName(final UUID dataCenterId, final String name) {
-        final Set<Server> servers = initRedisTemplate().opsForSet()
+        final Set<String> serverIds = redisIndexingTemplate.opsForSet()
                 .members(MessageFormat.format(SERVER_NAME_INDEX_KEY, dataCenterId, name));
 
-        if (CollectionUtils.isEmpty(servers)) {
+        if (CollectionUtils.isEmpty(serverIds)) {
             return null;
         }
 
-        if (servers.size() > 1) {
+        if (serverIds.size() > 1) {
             throw new RuntimeException("Problem with server data: more than one result found!");
         }
 
-        return servers.iterator().next();
+        return (Server) redisTemplate.opsForHash().get(getObjectKey(), serverIds.iterator().next());
     }
 
 }
