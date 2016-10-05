@@ -4,8 +4,16 @@
 
     $(document).ready(function() {
 
-        $("#startDatepicker").datepicker();
-        $("#endDatepicker").datepicker();
+        $("#startDatepicker").datepicker({
+            dateFormat: "yy-mm-dd",
+            changeMonth: true,
+            changeYear: true
+        });
+        $("#endDatepicker").datepicker({
+            dateFormat: "yy-mm-dd",
+            changeMonth: true,
+            changeYear: true
+        });
         
         $('#calendarDiv').fullCalendar({
             height: 450,
@@ -14,7 +22,7 @@
                 center: 'title',
                 right: 'month,basicWeek,basicDay'
             },            
-            defaultView: 'month',
+            defaultView: 'basicWeek',
             views: {
                 agendaWeek: {
                     groupByResource: true
@@ -42,13 +50,36 @@
         });  
 
         $("#submitReservationBtn").click(function() {
-            var newReservation = {
-                user: $('#usersList').val(),
-                start: $("#startDatepicker").val(),
-                end: $("#endDatepicker").val(),
-                server: $('#serversList').val()
+            var startDate = new Date($("#startDatepicker").val());
+            var endDate = new Date($("#endDatepicker").val());
+            endDate.setUTCDate(endDate.getUTCDate() + 1);
+            
+        	var reservation = {
+        		name: $('#title').val(),
+       		    owner_name: $('#usersList').val(),
+       		    server_name: $('#serversList').val(),
+       		    start_date: startDate.toISOString(),
+                end_date: endDate.toISOString()                
             };
-            alert("TODO[fcarta] - Sending: " + JSON.stringify(newReservation));
+            
+            $.ajax({
+                url: "http://localhost:9080/api/reservations", 
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(reservation), 
+                contentType: "application/json",
+                success: function(data,status) {
+                    var event = {
+                    	id: data.id,
+                    	title: "UNAPPROVED-" + data.name + "\n(" + data.server_name + " - " + data.owner_name + ")",
+                    	start: data.start_date,
+                    	end: data.end_date,
+                    	color: "lightgray",
+                   	    allDay: true                    		
+                    }
+                    addEvent(event);        
+                }
+            });
         })
 
         getUsers();
@@ -56,13 +87,17 @@
     });
     
     function stompSubscribeHandlers() {
-        stompClient.subscribe('/topic/updates', function(update){
-            updateReservation(JSON.parse(update.body));
+        stompClient.subscribe('/topic/events/add', function(event){
+        	updateEvent(JSON.parse(event.body));
         });
+        stompClient.subscribe('/topic/events/remove', function(event){
+            removeEvent(JSON.parse(event.body));
+        });        
     }
 
     function stompUnsubscribeHandlers() {
-        stompClient.unsubscribe('/topic/updates');
+        stompClient.unsubscribe('/topic/events/add');
+        stompClient.unsubscribe('/topic/events/remove');
     }
 
     function getUsers() {
@@ -70,7 +105,7 @@
             console.log('Getting users');
             $.each(users, function(index, user) {
                 console.log('User: ' + user.name);
-                updateUser(user);
+                addUser(user);
             });
         });
     }
@@ -80,7 +115,7 @@
             console.log('Getting servers');
             $.each(servers, function(index, server) {
                 console.log('Server: ' + server.name);
-                updateServer(server);
+                addServer(server);
             });
         });
     }
@@ -98,7 +133,6 @@
             
             $.each(schedule.events, function(index, event) {
                 console.log('Event: ' + event.id);
-               // $('#calendarDiv').fullCalendar('addEvent', event);
             });
             
             callback(schedule.events);
@@ -106,31 +140,33 @@
     }
 
     function updateServerReservation(event) {
-        confirm("Send Server Reservation update? " + event.title + " " + event.start.format() + " " + event.end.format());
+        confirm("NOT Implemented! - Send Server Reservation update? " + event.title + " " + event.start.format() + " " + event.end.format());
     }    
 
-    function updateUser(user) {
+    function addUser(user) {
         $('#usersList').append($("<option></option>")
                 .attr("value",user.name)
                 .text(user.name));
     }
 
-    function updateServer(server) {
+    function addServer(server) {
         $('#serversList').append($("<option></option>")
                 .attr("value",server.name)
                 .text(server.name));
     }
     
-    function updateReservation(reservation) {
-        //var response = $('#response');
-        //var p = document.createElement('p');
-        //p.style.wordWrap = 'break-word';
-        //p.appendChild(document.createTextNode(reservation.id 
-        //        + ", " + reservation.name
-        //        + ", " + reservation.server_name
-        //        + ", " + reservation.start_date
-        //        + ", " + reservation.end_date
-        //        + ", " + reservation.approved));
-        //response.append(p);
+    function addEvent(event) {
+        $('#calendarDiv').fullCalendar('renderEvent', event);
+    }    
+    
+    function removeEvent(event) {
+        $('#calendarDiv').fullCalendar('removeEvents', event.id);
     }
+    
+    function updateEvent(event) {
+        removeEvent(event);
+        addEvent(event);
+    }
+    
+    
 </script>

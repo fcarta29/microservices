@@ -14,6 +14,9 @@ public class ReservationDto extends AbstractDto {
     @JsonProperty(value = "name")
     private String name;
 
+    @JsonProperty(value = "owner_name")
+    private String ownerName;
+
     @JsonProperty(value = "server_name")
     private String serverName;
 
@@ -40,6 +43,14 @@ public class ReservationDto extends AbstractDto {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(final String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public String getServerName() {
@@ -79,6 +90,7 @@ public class ReservationDto extends AbstractDto {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((ownerName == null) ? 0 : ownerName.hashCode());
         result = prime * result + ((serverName == null) ? 0 : serverName.hashCode());
         result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
         result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
@@ -102,6 +114,13 @@ public class ReservationDto extends AbstractDto {
                 return false;
             }
         } else if (!name.equals(other.getName())) {
+            return false;
+        }
+        if (ownerName == null) {
+            if (other.getOwnerName() != null) {
+                return false;
+            }
+        } else if (!ownerName.equals(other.getOwnerName())) {
             return false;
         }
         if (serverName == null) {

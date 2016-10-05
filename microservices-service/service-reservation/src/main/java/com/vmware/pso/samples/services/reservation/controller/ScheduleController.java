@@ -80,7 +80,7 @@ public class ScheduleController extends AbstractReservationController<EventDto, 
                 + eventOwner.getUserName() + ")");
         event.setResources(Arrays.asList(eventResource.getName()));
         if (Status.APPROVED.equals(reservation.getStatus())) {
-            event.setColor(EventColor.assignEventColor());
+            event.setColor(EventColor.assignEventColor(reservation.getId()));
         }
         return event;
     }

@@ -1,6 +1,9 @@
 package com.vmware.pso.samples.core.dto;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -11,6 +14,7 @@ public class EventDto extends AbstractDto {
 
     // TODO[fcarta] - Create better way to assign and manage event colors
     private static final AtomicInteger colorIndex = new AtomicInteger(1);
+    private static final ConcurrentMap<UUID, EventColor> colorMap = new ConcurrentHashMap<UUID, EventColor>();
 
     public enum EventColor {
         LIGHTGRAY(-1, "lightgray"),
@@ -35,11 +39,13 @@ public class EventDto extends AbstractDto {
                 }
             }
 
-            throw new IllegalArgumentException("EventColor not found!");
+            throw new IllegalArgumentException(String.format("EventColor not found for index %d!", index));
         }
 
-        public static String assignEventColor() {
-            return EventColor.findByIndex(colorIndex.getAndIncrement() % EventColor.values().length).name;
+        public static String assignEventColor(final UUID id) {
+            colorMap.putIfAbsent(id,
+                    EventColor.findByIndex(colorIndex.getAndIncrement() % (EventColor.values().length - 1)));
+            return colorMap.get(id).name;
         }
     }
 
@@ -58,10 +64,13 @@ public class EventDto extends AbstractDto {
     private String end;
 
     @JsonProperty(value = "color")
-    private String color = EventColor.LIGHTGRAY.name();
+    private String color = EventColor.LIGHTGRAY.name;
 
     @JsonProperty(value = "resources")
     private List<String> resources;
+
+    @JsonProperty(value = "allDay")
+    private boolean allDay = true;
 
     public String getId() {
         return id;
@@ -109,6 +118,14 @@ public class EventDto extends AbstractDto {
 
     public void setResources(final List<String> resources) {
         this.resources = resources;
+    }
+
+    public boolean isAllDay() {
+        return allDay;
+    }
+
+    public void setAllDay(final boolean allDay) {
+        this.allDay = allDay;
     }
 
     @Override

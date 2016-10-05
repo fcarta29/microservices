@@ -37,6 +37,7 @@ public class ServersController extends AbstractReservationController<ServerDto, 
     @Override
     protected ServerDto toDto(final Server server) {
         final ServerDto serverDto = new ServerDto();
+        serverDto.setId(server.getId().toString());
         serverDto.setName(server.getName());
         return serverDto;
     }
