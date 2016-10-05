@@ -2,6 +2,8 @@ package com.vmware.pso.samples.core.model;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Server extends AbstractUUIDEntity {
 
     private static final long serialVersionUID = -7276263835137777339L;
@@ -56,11 +58,9 @@ public class Server extends AbstractUUIDEntity {
             return false;
         }
         final Server other = (Server) obj;
-        if (name == null) {
-            if (other.getName() != null) {
-                return false;
-            }
-        } else if (!name.equals(other.getName())) {
+        if (StringUtils.isBlank(name) && StringUtils.isNotBlank(other.getName())) {
+            return false;
+        } else if (!StringUtils.equals(name, other.getName())) {
             return false;
         }
         if (dataCenterId == null) {

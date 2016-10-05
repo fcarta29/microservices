@@ -2,6 +2,8 @@ package com.vmware.pso.samples.core.model;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.vmware.pso.samples.core.model.types.Status;
 
 public class Reservation extends AbstractUUIDEntity {
@@ -103,13 +105,11 @@ public class Reservation extends AbstractUUIDEntity {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
         result = prime * result + ((dataCenterId == null) ? 0 : dataCenterId.hashCode());
         result = prime * result + ((serverId == null) ? 0 : serverId.hashCode());
         result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
         result = prime * result + ((userId == null) ? 0 : userId.hashCode());
-        result = prime * result + ((startTimestamp == null) ? 0 : startTimestamp.hashCode());
-        result = prime * result + ((endTimestamp == null) ? 0 : endTimestamp.hashCode());
         return result;
     }
 
@@ -125,6 +125,11 @@ public class Reservation extends AbstractUUIDEntity {
             return false;
         }
         final Reservation other = (Reservation) obj;
+        if (StringUtils.isBlank(name) && StringUtils.isNotBlank(other.getName())) {
+            return false;
+        } else if (!StringUtils.equals(name, other.getName())) {
+            return false;
+        }
         if (dataCenterId == null) {
             if (other.getDataCenterId() != null) {
                 return false;
@@ -151,20 +156,6 @@ public class Reservation extends AbstractUUIDEntity {
                 return false;
             }
         } else if (!userId.equals(other.getUserId())) {
-            return false;
-        }
-        if (startTimestamp == null) {
-            if (other.getStartTimestamp() != null) {
-                return false;
-            }
-        } else if (!startTimestamp.equals(other.getStartTimestamp())) {
-            return false;
-        }
-        if (endTimestamp == null) {
-            if (other.getEndTimestamp() != null) {
-                return false;
-            }
-        } else if (!endTimestamp.equals(other.getEndTimestamp())) {
             return false;
         }
         return true;

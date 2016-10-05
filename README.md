@@ -7,6 +7,7 @@ Requirements:
 * docker
   * Make sure to add the `/data` directory to the list of directories that
   can be bind mounted into Docker containers,
+* Copy `microservices-data/data-rest-test/dump.rdb` to `/data/microservices/dump.rdb` to seed the database with defaults
 
 To build all the targets:
 ```

@@ -106,4 +106,16 @@
         "createdTimestamp": 1471983843293,
         "modifiedTimestamp": 1471984150904,
         "status": "WAITING"
+      },{
+        "id": "ba81093b-ae1e-4a78-9197-02652e032802",
+        "name": "Reservation - 2",
+        "dataCenterId": "aefd7ed1-7393-41a5-9ccf-311fca0b62d4",
+        "serverId": "3de053fc-f261-402a-bf34-2215c5aa2814",
+        "groupId": "82d515a8-2ab6-4b88-aceb-7d1aa70309fb",
+        "userId": "1beb73fb-b5d8-4cf8-b69a-d81b55e9967d",
+        "startTimestamp": 0,
+        "endTimestamp": 0,
+        "createdTimestamp": 1471983843293,
+        "modifiedTimestamp": 1471984150904,
+        "status": "APPROVED"
       }]

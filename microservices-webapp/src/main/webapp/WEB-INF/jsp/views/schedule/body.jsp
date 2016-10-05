@@ -6,10 +6,11 @@
 	<div class="panel panel-default">
 		<div id="schedulerDiv" class="panel-header"></div>
 		<div id="schedulerDiv" class="panel-body">
-			<span style="padding-right:20px"><label style="padding-right:10px">Name:</label><select id="usersList"></select></span>
-			<span style="padding-right:20px"><label style="padding-right:10px">Start Date:</label><nbsp;><input type="text" id="startDatepicker"></span>
-			<span style="padding-right:20px"><label style="padding-right:10px">End Date:</label><nbsp;><input type="text" id="endDatepicker"></span>
-			<span style="padding-right:20px"><label style="padding-right:10px">Server:</label><nbsp;><select id="serversList"></select></span>
+			<span style="padding-right:10px"><label style="padding-right:5px">Title:</label><input type="text" id="title" name="title" placeholder="Reservation Name"/></span>
+			<span style="padding-right:10px"><label style="padding-right:5px">User:</label><select id="usersList"></select></span>
+			<span style="padding-right:10px"><label style="padding-right:5px">Start Date:</label><nbsp;><input type="text" id="startDatepicker"></span>
+			<span style="padding-right:10px"><label style="padding-right:5px">End Date:</label><nbsp;><input type="text" id="endDatepicker"></span>
+			<span style="padding-right:10px"><label style="padding-right:5px">Server:</label><nbsp;><select id="serversList"></select></span>
 			<button id="submitReservationBtn" type="button" class="btn btn-primary">Submit</button>
 		</div>
 	</div>

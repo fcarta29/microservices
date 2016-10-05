@@ -10,9 +10,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.vmware.pso.samples.core.dao.ReservationDao;
 import com.vmware.pso.samples.core.dao.ServerDao;
+import com.vmware.pso.samples.core.dao.UserDao;
 import com.vmware.pso.samples.core.dto.ReservationDto;
 import com.vmware.pso.samples.core.model.Reservation;
 import com.vmware.pso.samples.core.model.Server;
+import com.vmware.pso.samples.core.model.User;
 import com.vmware.pso.samples.core.model.types.Status;
 
 public class ApprovalTask implements Callable<Reservation> {
@@ -22,6 +24,9 @@ public class ApprovalTask implements Callable<Reservation> {
 
     @Autowired
     private ServerDao serverDao;
+
+    @Autowired
+    private UserDao userDao;
 
     @Autowired
     private RedisTemplate<String, ReservationDto> redisTemplate;
@@ -66,6 +71,8 @@ public class ApprovalTask implements Callable<Reservation> {
         // find server by UUID to get name
         final Server server = serverDao.get(reservation.getServerId());
         reservationDto.setServerName(server.getName());
+        final User user = userDao.get(reservation.getUserId());
+        reservationDto.setOwnerName(user.getUserName());
         // convert datetime to readable format
         final SimpleDateFormat df = new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
         reservationDto.setStartDate(df.format(reservation.getStartTimestamp()));

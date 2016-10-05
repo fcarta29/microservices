@@ -21,7 +21,7 @@ public class GroupDaoRedis extends AbstractDaoRedis<Group> implements GroupDao {
 
     @Autowired
     @Qualifier("groupRedisTemplate")
-    private final RedisTemplate<String, Group> redisTemplate = new RedisTemplate<String, Group>();
+    private RedisTemplate<String, Group> redisTemplate;
 
     @Override
     public String getObjectKey() {
