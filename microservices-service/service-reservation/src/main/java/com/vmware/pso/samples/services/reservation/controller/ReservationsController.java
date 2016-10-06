@@ -7,8 +7,9 @@ import java.util.UUID;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vmware.pso.samples.core.dao.ReservationDao;
 import com.vmware.pso.samples.core.dao.ServerDao;
+import com.vmware.pso.samples.core.dao.UserDao;
 import com.vmware.pso.samples.core.dto.ReservationDto;
 import com.vmware.pso.samples.core.model.Reservation;
 import com.vmware.pso.samples.core.model.Server;
+import com.vmware.pso.samples.core.model.User;
 import com.vmware.pso.samples.core.model.types.Status;
 import com.vmware.pso.samples.services.reservation.updater.ApprovalScheduledExecutor;
 
@@ -37,6 +40,12 @@ public class ReservationsController extends AbstractReservationController<Reserv
     @Autowired
     private ServerDao serverDao;
 
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private RedisTemplate<String, ReservationDto> redisTemplate;
+
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     final public @ResponseBody Collection<ReservationDto> getList() {
         return toDtoList(reservationDao.list());
@@ -47,7 +56,6 @@ public class ReservationsController extends AbstractReservationController<Reserv
         return toDto(reservationDao.get(id));
     }
 
-    @SendTo(value = { "/topic/updates" })
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     final public @ResponseBody ReservationDto create(@RequestBody final ReservationDto reservationDto) {
         // TODO[fcarta] data validation here
@@ -60,11 +68,9 @@ public class ReservationsController extends AbstractReservationController<Reserv
         // schedule reservation for approval
         final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(reservation);
 
-        // TODO[fcarta] fix this
         return toDto(reservation);
     }
 
-    @SendTo(value = { "/topic/updates" })
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json")
     final public @ResponseBody ReservationDto save(@PathVariable("id") final UUID id,
             final @RequestBody ReservationDto reservationDto) {
@@ -81,7 +87,24 @@ public class ReservationsController extends AbstractReservationController<Reserv
             final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(persistedReservation);
         }
 
-        return toDto(persistedReservation);
+        final ReservationDto returnReservationDto = toDto(persistedReservation);
+        if (Status.APPROVED.equals(persistedReservation.getStatus())) {
+            // notify of the approved update
+            redisTemplate.convertAndSend("/reservation/updates", returnReservationDto);
+        }
+
+        return returnReservationDto;
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    final public void delete(@PathVariable("id") final UUID id) {
+        final Reservation reservation = reservationDao.get(id);
+        if (reservation != null) {
+            reservationDao.remove(reservation);
+        }
+
+        // notify of deleted reservation
+        redisTemplate.convertAndSend("/reservation/deletes", toDto(reservation));
     }
 
     protected void mergeEntities(final Reservation persistedReservation, final Reservation reservation) {
@@ -103,6 +126,8 @@ public class ReservationsController extends AbstractReservationController<Reserv
         // find server by UUID to get name
         final Server server = serverDao.get(reservation.getServerId());
         reservationDto.setServerName(server.getName());
+        final User user = userDao.get(reservation.getUserId());
+        reservationDto.setOwnerName(user.getUserName());
         // convert datetime to readable format
         final SimpleDateFormat df = new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
         reservationDto.setStartDate(df.format(reservation.getStartTimestamp()));
@@ -114,15 +139,19 @@ public class ReservationsController extends AbstractReservationController<Reserv
     @Override
     protected Reservation toEntity(final ReservationDto reservationDto) {
         final Reservation reservation = new Reservation();
-        reservation.setName(reservationDto.getName());
+        reservation.setName(StringUtils.isBlank(reservationDto.getName()) ? "Reservation" : reservationDto.getName());
         // TODO[fcarta] need to fix these when ready for full impl
         reservation.setDataCenterId(DEFAULT_DATACENTER_ID);
         reservation.setGroupId(DEFAULT_GROUP_ID);
-        reservation.setUserId(DEFAULT_USER_ID);
         // find the server by name so we can use reference by UUID
         final Server server = serverDao.findByName(DEFAULT_DATACENTER_ID, reservationDto.getServerName());
         reservation.setServerId(server.getId());
-
+        if (StringUtils.isBlank(reservationDto.getOwnerName())) {
+            reservation.setUserId(DEFAULT_USER_ID);
+        } else {
+            final User user = userDao.findByUserName(DEFAULT_GROUP_ID, reservationDto.getOwnerName());
+            reservation.setUserId(user.getId());
+        }
         final Calendar startTime = DatatypeConverter.parseDate(reservationDto.getStartDate());
         reservation.setStartTimestamp(startTime.getTimeInMillis());
         final Calendar endTime = DatatypeConverter.parseDate(reservationDto.getEndDate());

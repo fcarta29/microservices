@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ServerDto extends AbstractDto {
+public class UserDto extends AbstractDto {
 
     private static final long serialVersionUID = -557793667337515271L;
 
@@ -46,10 +46,10 @@ public class ServerDto extends AbstractDto {
         if (!super.equals(obj)) {
             return false;
         }
-        if (!(obj instanceof ServerDto)) {
+        if (!(obj instanceof UserDto)) {
             return false;
         }
-        final ServerDto other = (ServerDto) obj;
+        final UserDto other = (UserDto) obj;
         if (name == null) {
             if (other.getName() != null) {
                 return false;

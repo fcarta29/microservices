@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,7 +23,7 @@ public abstract class AbstractDaoRedis<E extends AbstractUUIDEntity> implements 
     @Autowired
     protected JedisConnectionFactory jedisConnectionFactory;
 
-    private Class<E> typeOfEntity;
+    private final Class<E> typeOfEntity;
 
     @SuppressWarnings("unchecked")
     public AbstractDaoRedis() {
@@ -33,20 +34,16 @@ public abstract class AbstractDaoRedis<E extends AbstractUUIDEntity> implements 
     public abstract String getObjectKey();
 
     /**
-     * NOTE[fcarta] - RedisTemplate is only able to contain one instance of
-     * XxxValueSerializer therefore we have to init the RedisTemplate here and
-     * add the following in each extending class
+     * NOTE[fcarta] - RedisTemplate is only able to contain one instance of XxxValueSerializer therefore we have to init
+     * the RedisTemplate here and add the following in each extending class
      * 
-     * @Bean(name="tileRedisTemplate") public RedisTemplate
-     *                                 <String,Tile> redisTemplate() { return
-     *                                 initRedisTemplate(); }
+     * @Bean(name="tileRedisTemplate") public RedisTemplate <String,Tile> redisTemplate() { return initRedisTemplate();
+     *                                 }
      * 
-     * @Autowired @Qualifier("tileRedisTemplate") private RedisTemplate
-     *            <String,Tile> redisTemplate = new RedisTemplate
+     * @Autowired @Qualifier("tileRedisTemplate") private RedisTemplate <String,Tile> redisTemplate = new RedisTemplate
      *            <String,Tile>();
      * 
-     * @Override public RedisTemplate<String,Tile> getRedisTemplate() { return
-     *           redisTemplate; }
+     * @Override public RedisTemplate<String,Tile> getRedisTemplate() { return redisTemplate; }
      * 
      * 
      * @return
@@ -62,13 +59,26 @@ public abstract class AbstractDaoRedis<E extends AbstractUUIDEntity> implements 
         return redisTemplate;
     }
 
+    @Bean(name = "redisIndexingTemplate")
+    protected RedisTemplate<String, String> redisIndexingTemplate() {
+        final RedisTemplate<String, String> redisTemplate = new RedisTemplate<String, String>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
     public abstract RedisTemplate<String, E> getRedisTemplate();
 
+    @Override
     @SuppressWarnings("unchecked")
     public E get(final UUID id) {
         return (E) getRedisTemplate().opsForHash().get(getObjectKey(), id.toString());
     }
 
+    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<E> getList(final Collection<UUID> ids) {
         // need to convert the UUIDs to a collection of strings to get data back
@@ -79,16 +89,25 @@ public abstract class AbstractDaoRedis<E extends AbstractUUIDEntity> implements 
         return (List<E>) (List<?>) getRedisTemplate().opsForHash().multiGet(getObjectKey(), idsAsStringCollection);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<E> list() {
         return (List<E>) (List<?>) getRedisTemplate().opsForHash().values(getObjectKey());
     }
 
+    @Override
     public void save(final E entity) {
+        boolean isUpdate = Boolean.TRUE;
         if (entity.getId() == null) {
             entity.setId(UUID.randomUUID());
+            // this is a new record
+            isUpdate = Boolean.FALSE;
         }
         getRedisTemplate().opsForHash().put(getObjectKey(), entity.getId().toString(), entity);
+        if (isUpdate) {
+            // clear out old indexes and update
+            clearIndexes(entity);
+        }
         setIndexes(entity);
     }
 
@@ -96,7 +115,13 @@ public abstract class AbstractDaoRedis<E extends AbstractUUIDEntity> implements 
         // Override to set custom indexes for lookups
     }
 
+    protected void clearIndexes(final E Entity) {
+        // Override to clear custom indexes for lookups
+    }
+
+    @Override
     public void remove(final E entity) {
+        clearIndexes(entity);
         getRedisTemplate().opsForHash().delete(getObjectKey(), entity.getId().toString());
     }
 }

@@ -10,10 +10,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+import com.vmware.pso.samples.core.dto.ReservationDto;
 import com.vmware.pso.samples.services.reservation.reciever.ReservationReceiver;
 
 @Configuration
@@ -39,17 +42,26 @@ public class ReservationRedisConfig {
     }
 
     @Bean
+    public RedisTemplate<String, ReservationDto> redisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
+        final RedisTemplate<String, ReservationDto> redisTemplate = new RedisTemplate<String, ReservationDto>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory);
+        redisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<ReservationDto>(ReservationDto.class));
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    @Bean
     public MessageListenerAdapter listenerAdapter(final ReservationReceiver receiver) {
         return new MessageListenerAdapter(receiver, "receiveMessage");
     }
 
     @Bean
-    ReservationReceiver receiver(final CountDownLatch latch) {
+    public ReservationReceiver receiver(final CountDownLatch latch) {
         return new ReservationReceiver(latch);
     }
 
     @Bean
-    CountDownLatch latch() {
+    public CountDownLatch latch() {
         return new CountDownLatch(1);
     }
 

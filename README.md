@@ -7,6 +7,7 @@ Requirements:
 * docker
   * Make sure to add the `/data` directory to the list of directories that
   can be bind mounted into Docker containers,
+* Copy `microservices-data/data-rest-test/dump.rdb` to `/data/microservices/dump.rdb` to seed the database with defaults
 
 To build all the targets:
 ```
@@ -56,6 +57,15 @@ docker-compose up service-approval
 ```
 Swagger documentation:
 `http://{docker_host}:9082/swagger-ui.html`
+
+### Microservices Webapp
+Microservices Webapp that serves as front end for service consumption (Currently only Reservation scheduling)
+```
+docker-compose up webapp
+```
+Web UI
+`http://{docker_host}:8080
+_*Click connect to get reservation listtings and enable realtime updates
 
 ### Test
 To create the SoapUI testing Docker image:
