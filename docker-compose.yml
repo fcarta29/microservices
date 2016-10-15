@@ -41,6 +41,16 @@ services:
       - "redis:redis"
     depends_on:
       - redis
+  service-error:
+    build:
+      context: ./microservices-service/service-error
+      dockerfile: Dockerfile
+    ports:
+      - "9083:9083"
+    links:
+      - "redis:redis"
+    depends_on:
+      - redis      
   webapp:
     build:
       context: ./microservices-webapp
@@ -50,7 +60,8 @@ services:
     links:
       - "redis:redis"
     depends_on:
-      - redis      
+      - redis  
+      - service-reservation    
   redis:
     image: redis
     ports:

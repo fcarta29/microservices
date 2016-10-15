@@ -1,8 +1,7 @@
-package com.vmware.pso.samples.services.reservation;
+package com.vmware.pso.samples.services.error;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,15 +16,16 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import com.vmware.pso.samples.core.dto.ErrorDto;
-import com.vmware.pso.samples.core.dto.ReservationDto;
-import com.vmware.pso.samples.services.reservation.reciever.ReservationReceiver;
+import com.vmware.pso.samples.services.error.reciever.ErrorReceiver;
 
 @Configuration
 @PropertySource("classpath:/redis.properties")
-public class ReservationRedisConfig {
+public class ErrorRedisConfig {
 
     private @Value("${redis.host-name}") String redisHostName;
     private @Value("${redis.port}") int redisPort;
+
+    public static final String DEFAULT_ERROR_CHANNEL = "/services/errors";
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -42,33 +42,25 @@ public class ReservationRedisConfig {
     }
 
     @Bean
-    @Qualifier("redisTemplate")
-    public RedisTemplate<String, ReservationDto> redisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
-        final RedisTemplate<String, ReservationDto> redisTemplate = new RedisTemplate<String, ReservationDto>();
+    public RedisTemplate<String, ErrorDto> redisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
+        final RedisTemplate<String, ErrorDto> redisTemplate = new RedisTemplate<String, ErrorDto>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory);
-        redisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<ReservationDto>(ReservationDto.class));
+        redisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<ErrorDto>(ErrorDto.class));
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 
     @Bean
-    @Qualifier("errorRedisTemplate")
-    public RedisTemplate<String, ErrorDto> errorRedisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
-        final RedisTemplate<String, ErrorDto> errorRedisTemplate = new RedisTemplate<String, ErrorDto>();
-        errorRedisTemplate.setConnectionFactory(jedisConnectionFactory);
-        errorRedisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<ErrorDto>(ErrorDto.class));
-        errorRedisTemplate.afterPropertiesSet();
-        return errorRedisTemplate;
+    public MessageListenerAdapter listenerAdapter(final ErrorReceiver errorReceiver) {
+        final MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(errorReceiver,
+                "receiveMessage");
+        messageListenerAdapter.setSerializer(new Jackson2JsonRedisSerializer<ErrorDto>(ErrorDto.class));
+        return messageListenerAdapter;
     }
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(final ReservationReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
-    }
-
-    @Bean
-    public ReservationReceiver receiver(final CountDownLatch latch) {
-        return new ReservationReceiver(latch);
+    public ErrorReceiver receiver(final CountDownLatch latch) {
+        return new ErrorReceiver(latch);
     }
 
     @Bean
@@ -82,7 +74,7 @@ public class ReservationRedisConfig {
 
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new PatternTopic("data"));
+        container.addMessageListener(listenerAdapter, new PatternTopic(DEFAULT_ERROR_CHANNEL));
 
         return container;
     }

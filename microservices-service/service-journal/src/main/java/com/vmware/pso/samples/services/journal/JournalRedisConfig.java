@@ -1,4 +1,4 @@
-package com.vmware.pso.samples.services.reservation;
+package com.vmware.pso.samples.services.journal;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -18,11 +18,11 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import com.vmware.pso.samples.core.dto.ErrorDto;
 import com.vmware.pso.samples.core.dto.ReservationDto;
-import com.vmware.pso.samples.services.reservation.reciever.ReservationReceiver;
+import com.vmware.pso.samples.services.journal.reciever.JournalReceiver;
 
 @Configuration
 @PropertySource("classpath:/redis.properties")
-public class ReservationRedisConfig {
+public class JournalRedisConfig {
 
     private @Value("${redis.host-name}") String redisHostName;
     private @Value("${redis.port}") int redisPort;
@@ -62,13 +62,13 @@ public class ReservationRedisConfig {
     }
 
     @Bean
-    public MessageListenerAdapter listenerAdapter(final ReservationReceiver receiver) {
+    public MessageListenerAdapter listenerAdapter(final JournalReceiver receiver) {
         return new MessageListenerAdapter(receiver, "receiveMessage");
     }
 
     @Bean
-    public ReservationReceiver receiver(final CountDownLatch latch) {
-        return new ReservationReceiver(latch);
+    public JournalReceiver receiver(final CountDownLatch latch) {
+        return new JournalReceiver(latch);
     }
 
     @Bean
