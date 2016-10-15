@@ -58,6 +58,14 @@ docker-compose up service-approval
 Swagger documentation:
 `http://{docker_host}:9082/swagger-ui.html`
 
+### Error Service
+Error Service for collecting service errors and email those to configured email
+```
+docker-compose up service-error
+```
+Swagger documentation:
+`http://{docker_host}:9083/swagger-ui.html`
+
 ### Microservices Webapp
 Microservices Webapp that serves as front end for service consumption (Currently only Reservation scheduling)
 ```
