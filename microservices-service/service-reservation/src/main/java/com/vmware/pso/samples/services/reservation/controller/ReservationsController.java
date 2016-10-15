@@ -22,6 +22,7 @@ import com.vmware.pso.samples.core.dao.ReservationDao;
 import com.vmware.pso.samples.core.dao.ServerDao;
 import com.vmware.pso.samples.core.dao.UserDao;
 import com.vmware.pso.samples.core.dto.ReservationDto;
+import com.vmware.pso.samples.core.dto.TopicDto;
 import com.vmware.pso.samples.core.model.Reservation;
 import com.vmware.pso.samples.core.model.Server;
 import com.vmware.pso.samples.core.model.User;
@@ -48,6 +49,10 @@ public class ReservationsController extends AbstractReservationController<Reserv
     @Qualifier("redisTemplate")
     private RedisTemplate<String, ReservationDto> redisTemplate;
 
+    @Autowired
+    @Qualifier("topicRedisTemplate")
+    private RedisTemplate<String, TopicDto> topicRedisTemplate;
+
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     final public @ResponseBody Collection<ReservationDto> getList() {
         return toDtoList(reservationDao.list());
@@ -69,6 +74,9 @@ public class ReservationsController extends AbstractReservationController<Reserv
 
         // schedule reservation for approval
         final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(reservation);
+        final TopicDto topicDto = new TopicDto();
+        topicDto.setMessage(reservation.getId().toString());
+        topicRedisTemplate.convertAndSend("/reservation/requests", topicDto);
 
         return toDto(reservation);
     }
@@ -87,6 +95,9 @@ public class ReservationsController extends AbstractReservationController<Reserv
         // schedule reservation for approval only if waiting
         if (Status.WAITING.equals(persistedReservation.getStatus())) {
             final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(persistedReservation);
+            final TopicDto topicDto = new TopicDto();
+            topicDto.setMessage(reservation.getId().toString());
+            topicRedisTemplate.convertAndSend("/reservation/requests", topicDto);
         }
 
         final ReservationDto returnReservationDto = toDto(persistedReservation);
