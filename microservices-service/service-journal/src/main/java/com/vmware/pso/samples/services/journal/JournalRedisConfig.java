@@ -15,9 +15,10 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.vmware.pso.samples.core.dto.ErrorDto;
-import com.vmware.pso.samples.core.dto.ReservationDto;
+import com.vmware.pso.samples.core.dto.TopicDto;
 import com.vmware.pso.samples.services.journal.reciever.JournalReceiver;
 
 @Configuration
@@ -41,14 +42,25 @@ public class JournalRedisConfig {
         return factory;
     }
 
-    @Bean
-    @Qualifier("redisTemplate")
-    public RedisTemplate<String, ReservationDto> redisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
-        final RedisTemplate<String, ReservationDto> redisTemplate = new RedisTemplate<String, ReservationDto>();
+    @Bean(name = "redisTemplate")
+    protected RedisTemplate<String, String> redisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
+        final RedisTemplate<String, String> redisTemplate = new RedisTemplate<String, String>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory);
-        redisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<ReservationDto>(ReservationDto.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
+    }
+
+    @Bean
+    @Qualifier("topicRedisTemplate")
+    public RedisTemplate<String, TopicDto> topicRedisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
+        final RedisTemplate<String, TopicDto> topicRedisTemplate = new RedisTemplate<String, TopicDto>();
+        topicRedisTemplate.setConnectionFactory(jedisConnectionFactory);
+        topicRedisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<TopicDto>(TopicDto.class));
+        topicRedisTemplate.afterPropertiesSet();
+        return topicRedisTemplate;
     }
 
     @Bean
@@ -63,7 +75,9 @@ public class JournalRedisConfig {
 
     @Bean
     public MessageListenerAdapter listenerAdapter(final JournalReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
+        final MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(receiver, "receiveMessage");
+        messageListenerAdapter.setSerializer(new Jackson2JsonRedisSerializer<TopicDto>(TopicDto.class));
+        return messageListenerAdapter;
     }
 
     @Bean
@@ -82,7 +96,7 @@ public class JournalRedisConfig {
 
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new PatternTopic("data"));
+        container.addMessageListener(listenerAdapter, new PatternTopic("/reservation/requests"));
 
         return container;
     }

@@ -18,6 +18,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import com.vmware.pso.samples.core.dto.ErrorDto;
 import com.vmware.pso.samples.core.dto.ReservationDto;
+import com.vmware.pso.samples.core.dto.TopicDto;
 import com.vmware.pso.samples.services.reservation.reciever.ReservationReceiver;
 
 @Configuration
@@ -59,6 +60,16 @@ public class ReservationRedisConfig {
         errorRedisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<ErrorDto>(ErrorDto.class));
         errorRedisTemplate.afterPropertiesSet();
         return errorRedisTemplate;
+    }
+
+    @Bean
+    @Qualifier("topicRedisTemplate")
+    public RedisTemplate<String, TopicDto> topicRedisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
+        final RedisTemplate<String, TopicDto> topicRedisTemplate = new RedisTemplate<String, TopicDto>();
+        topicRedisTemplate.setConnectionFactory(jedisConnectionFactory);
+        topicRedisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<TopicDto>(TopicDto.class));
+        topicRedisTemplate.afterPropertiesSet();
+        return topicRedisTemplate;
     }
 
     @Bean
