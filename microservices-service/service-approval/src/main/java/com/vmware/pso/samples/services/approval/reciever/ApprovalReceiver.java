@@ -18,5 +18,6 @@ public class ApprovalReceiver {
 
     public void receiveMessage(final String message) {
         LOG.info("Received <" + message + ">");
+        latch.countDown();
     }
 }
