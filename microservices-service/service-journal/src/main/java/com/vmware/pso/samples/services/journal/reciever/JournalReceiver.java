@@ -1,18 +1,18 @@
-package com.vmware.pso.samples.services.reservation.reciever;
+package com.vmware.pso.samples.services.journal.reciever;
 
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ReservationReceiver {
+public class JournalReceiver {
 
-    private final static Logger LOG = Logger.getLogger(ReservationReceiver.class);
+    private final static Logger LOG = Logger.getLogger(JournalReceiver.class);
 
     private final CountDownLatch latch;
 
     @Autowired
-    public ReservationReceiver(final CountDownLatch latch) {
+    public JournalReceiver(final CountDownLatch latch) {
         this.latch = latch;
     }
 

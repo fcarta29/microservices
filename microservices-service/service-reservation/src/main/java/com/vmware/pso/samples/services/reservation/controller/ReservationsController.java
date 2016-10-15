@@ -9,6 +9,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,7 @@ public class ReservationsController extends AbstractReservationController<Reserv
     private UserDao userDao;
 
     @Autowired
+    @Qualifier("redisTemplate")
     private RedisTemplate<String, ReservationDto> redisTemplate;
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
