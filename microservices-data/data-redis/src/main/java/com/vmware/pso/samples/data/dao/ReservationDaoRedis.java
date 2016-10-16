@@ -1,11 +1,13 @@
 package com.vmware.pso.samples.data.dao;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,11 +18,13 @@ import org.springframework.util.CollectionUtils;
 
 import com.vmware.pso.samples.core.dao.ReservationDao;
 import com.vmware.pso.samples.core.model.Reservation;
+import com.vmware.pso.samples.core.model.types.Status;
 
 @Repository("reservationDao")
 public class ReservationDaoRedis extends AbstractDaoRedis<Reservation> implements ReservationDao {
 
     private static final String OBJECT_KEY = "Reservation";
+    private static final String TEAM_STATUS_KEY = "Reservation:Group:{0}:Status:{1}";
     private static final String STARTDATE_INDEX_KEY = "Reservation:StartDate";
     private static final String ENDDATE_INDEX_KEY = "Reservation:EndDate";
 
@@ -54,12 +58,16 @@ public class ReservationDaoRedis extends AbstractDaoRedis<Reservation> implement
                 reservation.getStartTimestamp());
         redisIndexingTemplate.opsForZSet().add(ENDDATE_INDEX_KEY, reservation.getId().toString(),
                 reservation.getEndTimestamp());
+        redisIndexingTemplate.opsForSet().add(MessageFormat.format(TEAM_STATUS_KEY, reservation.getGroupId().toString(),
+                reservation.getStatus().name()), reservation.getId().toString());
     }
 
     @Override
     protected void clearIndexes(final Reservation reservation) {
         redisIndexingTemplate.opsForZSet().remove(STARTDATE_INDEX_KEY, reservation.getId().toString());
         redisIndexingTemplate.opsForZSet().remove(ENDDATE_INDEX_KEY, reservation.getId().toString());
+        redisIndexingTemplate.opsForSet().remove(MessageFormat.format(TEAM_STATUS_KEY,
+                reservation.getGroupId().toString(), reservation.getStatus().name()), reservation.getId().toString());
     }
 
     @Override
@@ -92,4 +100,19 @@ public class ReservationDaoRedis extends AbstractDaoRedis<Reservation> implement
         return new HashSet<Reservation>(reservations);
     }
 
+    @Override
+    public Set<Reservation> findByGroupAndStatus(final UUID groupId, final Status status) {
+        final Collection<String> reservationIds = new LinkedHashSet<String>();
+        reservationIds.addAll(redisIndexingTemplate.opsForSet()
+                .members(MessageFormat.format(TEAM_STATUS_KEY, groupId.toString(), status.name())));
+        if (CollectionUtils.isEmpty(reservationIds)) {
+            return Collections.emptySet();
+        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        final List<Reservation> reservations = (List<Reservation>) (List<?>) getRedisTemplate().opsForHash()
+                .multiGet(getObjectKey(), (Collection) reservationIds);
+
+        return new HashSet<Reservation>(reservations);
+    }
 }
