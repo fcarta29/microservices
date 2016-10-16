@@ -17,8 +17,6 @@ public class JournalReceiver {
 
     final static String TOPICS_KEY = "topics";
 
-    final static String TOPIC_TEAM_DEFAULT = "2"; // for team 2 since this is the default for the testing
-
     @Autowired
     @Qualifier("redisTemplate")
     private RedisTemplate<String, String> redisTemplate;
@@ -30,8 +28,8 @@ public class JournalReceiver {
 
     public void receiveMessage(final TopicDto topicDto) {
         LOG.info(String.format("Received reservation request for %s", topicDto.getMessage()));
-        redisTemplate.opsForList().rightPush(TOPIC_TEAM_DEFAULT, topicDto.getMessage());
-        redisTemplate.opsForZSet().incrementScore(TOPICS_KEY, TOPIC_TEAM_DEFAULT, 1);
+        redisTemplate.opsForList().rightPush(topicDto.getTopic(), topicDto.getMessage());
+        redisTemplate.opsForZSet().incrementScore(TOPICS_KEY, topicDto.getTopic(), 1);
         latch.countDown();
     }
 }

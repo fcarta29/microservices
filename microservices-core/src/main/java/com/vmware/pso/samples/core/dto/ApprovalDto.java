@@ -14,6 +14,9 @@ public class ApprovalDto extends AbstractDto {
     @JsonProperty(value = "teamID")
     private String teamId;
 
+    @JsonProperty(value = "reservationId")
+    private String reservationId;
+
     @JsonProperty(value = "approved")
     private boolean approved;
 
@@ -33,6 +36,14 @@ public class ApprovalDto extends AbstractDto {
         this.teamId = teamId;
     }
 
+    public String getReservationId() {
+        return reservationId;
+    }
+
+    public void setReservationId(final String reservationId) {
+        this.reservationId = reservationId;
+    }
+
     public boolean isApproved() {
         return approved;
     }
@@ -47,6 +58,7 @@ public class ApprovalDto extends AbstractDto {
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((teamId == null) ? 0 : teamId.hashCode());
+        result = prime * result + ((reservationId == null) ? 0 : reservationId.hashCode());
         return result;
     }
 
@@ -74,6 +86,13 @@ public class ApprovalDto extends AbstractDto {
                 return false;
             }
         } else if (!teamId.equals(other.getTeamId())) {
+            return false;
+        }
+        if (reservationId == null) {
+            if (other.getReservationId() != null) {
+                return false;
+            }
+        } else if (!reservationId.equals(other.getReservationId())) {
             return false;
         }
         return true;
