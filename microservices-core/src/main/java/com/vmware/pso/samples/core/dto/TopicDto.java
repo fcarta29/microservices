@@ -11,6 +11,9 @@ public class TopicDto extends AbstractDto {
     @JsonProperty(value = "id")
     private String id;
 
+    @JsonProperty(value = "topic")
+    private String topic;
+
     @JsonProperty(value = "message")
     private String message;
 
@@ -20,6 +23,14 @@ public class TopicDto extends AbstractDto {
 
     public void setId(final String id) {
         this.id = id;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(final String topic) {
+        this.topic = topic;
     }
 
     public String getMessage() {
@@ -35,6 +46,7 @@ public class TopicDto extends AbstractDto {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((topic == null) ? 0 : topic.hashCode());
         result = prime * result + ((message == null) ? 0 : message.hashCode());
         return result;
     }
@@ -56,6 +68,13 @@ public class TopicDto extends AbstractDto {
                 return false;
             }
         } else if (!id.equals(other.getId())) {
+            return false;
+        }
+        if (topic == null) {
+            if (other.getTopic() != null) {
+                return false;
+            }
+        } else if (!topic.equals(other.getTopic())) {
             return false;
         }
         if (message == null) {

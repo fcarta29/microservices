@@ -22,7 +22,8 @@ import com.vmware.pso.samples.core.dto.TopicDto;
 @RequestMapping("/api/topic")
 public class TopicController {
 
-    final static AtomicInteger TOPIC_ID = new AtomicInteger(0);
+    // TODO[fcarta] an id is required because of tests but its not used anywhere functional
+    private static AtomicInteger fakeId = new AtomicInteger(0);
 
     final static String TOPICS_KEY = "topics";
 
@@ -41,7 +42,7 @@ public class TopicController {
             }
 
             final TopicDto topicDto = new TopicDto();
-            topicDto.setId(String.valueOf(TOPIC_ID.incrementAndGet()));
+            topicDto.setId(String.valueOf(fakeId.incrementAndGet()));
             topicDto.setMessage(messages.get(0));
             return topicDto;
         }
@@ -53,7 +54,7 @@ public class TopicController {
         }
 
         final TopicDto topicDto = new TopicDto();
-        topicDto.setId(String.valueOf(TOPIC_ID.incrementAndGet()));
+        topicDto.setId(String.valueOf(fakeId.incrementAndGet()));
         topicDto.setMessage(message);
         return topicDto;
     }

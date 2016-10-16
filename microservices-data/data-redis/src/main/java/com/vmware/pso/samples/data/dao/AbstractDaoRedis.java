@@ -103,11 +103,13 @@ public abstract class AbstractDaoRedis<E extends AbstractUUIDEntity> implements 
             // this is a new record
             isUpdate = Boolean.FALSE;
         }
-        getRedisTemplate().opsForHash().put(getObjectKey(), entity.getId().toString(), entity);
+        // TODO[fcarta] - should make this all transactional
         if (isUpdate) {
             // clear out old indexes and update
-            clearIndexes(entity);
+            final E oldEntity = (E) getRedisTemplate().opsForHash().get(getObjectKey(), entity.getId().toString());
+            clearIndexes(oldEntity);
         }
+        getRedisTemplate().opsForHash().put(getObjectKey(), entity.getId().toString(), entity);
         setIndexes(entity);
     }
 

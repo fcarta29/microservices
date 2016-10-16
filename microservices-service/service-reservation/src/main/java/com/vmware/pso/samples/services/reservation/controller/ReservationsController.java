@@ -18,11 +18,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vmware.pso.samples.core.dao.GroupDao;
 import com.vmware.pso.samples.core.dao.ReservationDao;
 import com.vmware.pso.samples.core.dao.ServerDao;
 import com.vmware.pso.samples.core.dao.UserDao;
 import com.vmware.pso.samples.core.dto.ReservationDto;
 import com.vmware.pso.samples.core.dto.TopicDto;
+import com.vmware.pso.samples.core.model.Group;
 import com.vmware.pso.samples.core.model.Reservation;
 import com.vmware.pso.samples.core.model.Server;
 import com.vmware.pso.samples.core.model.User;
@@ -41,6 +43,9 @@ public class ReservationsController extends AbstractReservationController<Reserv
 
     @Autowired
     private ServerDao serverDao;
+
+    @Autowired
+    private GroupDao groupDao;
 
     @Autowired
     private UserDao userDao;
@@ -75,6 +80,8 @@ public class ReservationsController extends AbstractReservationController<Reserv
         // schedule reservation for approval
         final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(reservation);
         final TopicDto topicDto = new TopicDto();
+        final Group group = groupDao.get(reservation.getGroupId());
+        topicDto.setTopic(group.getName()); // using group name here because testing uses that as its topic
         topicDto.setMessage(reservation.getId().toString());
         topicRedisTemplate.convertAndSend("/reservation/requests", topicDto);
 
@@ -96,6 +103,8 @@ public class ReservationsController extends AbstractReservationController<Reserv
         if (Status.WAITING.equals(persistedReservation.getStatus())) {
             final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(persistedReservation);
             final TopicDto topicDto = new TopicDto();
+            final Group group = groupDao.get(reservation.getGroupId());
+            topicDto.setTopic(group.getName()); // using group name here because testing uses that as its topic
             topicDto.setMessage(reservation.getId().toString());
             topicRedisTemplate.convertAndSend("/reservation/requests", topicDto);
         }
