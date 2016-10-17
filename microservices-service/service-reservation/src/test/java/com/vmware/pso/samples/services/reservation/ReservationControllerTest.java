@@ -1,6 +1,5 @@
 package com.vmware.pso.samples.services.reservation;
 
-
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
@@ -52,173 +51,167 @@ import com.vmware.pso.samples.services.reservation.updater.ApprovalScheduledExec
 import com.vmware.pso.samples.services.util.TestUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={ReservationApplication.class})
+@ContextConfiguration(classes = { ReservationApplication.class })
 @WebAppConfiguration
 public class ReservationControllerTest {
 
-	@Mock
+    @Mock
     private ReservationDao reservationDao;
-	
-	@Mock
+
+    @Mock
     private ServerDao serverDao;
-	
-	@Mock
+
+    @Mock
     private UserDao userDao;
-	
-	@Mock
+
+    @Mock
     private GroupDao groupDao;
-	
-	@Mock
+
+    @Mock
     private ApprovalScheduledExecutor approvalScheduledExecutor;
-	
-	@Mock
-	private RedisTemplate<String, ReservationDto> redisTemplate;
-	
-	@Mock
-	private RedisTemplate<String, TopicDto> topicRedisTemplate;
-	
+
+    @Mock
+    private RedisTemplate<String, ReservationDto> redisTemplate;
+
+    @Mock
+    private RedisTemplate<String, TopicDto> topicRedisTemplate;
+
     @InjectMocks
     private ReservationsController reservationsController;
-    
 
     MockMvc mockMvc;
+
     @Before
     public void setUp() {
-    	 MockitoAnnotations.initMocks(this);
-    	 
-         mockMvc = MockMvcBuilders.standaloneSetup(reservationsController).build();
-         Server server = new Server();
-         server.setId(UUID.randomUUID());
-         server.setName("Test Server");
-         when(serverDao.get(any())).thenReturn(server);
-         when(serverDao.findByName(any(), any())).thenReturn(server);
-         
-         User user = new User();
-         user.setUserName("Test User");
-         when(userDao.get(any())).thenReturn(user);
-         
-         Group group = new Group();
-         group.setName("Test Group");
-         when(groupDao.get(any())).thenReturn(group);
+        MockitoAnnotations.initMocks(this);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(reservationsController).build();
+        Server server = new Server();
+        server.setId(UUID.randomUUID());
+        server.setName("Test Server");
+        when(serverDao.get(any())).thenReturn(server);
+        when(serverDao.findByName(any(), any())).thenReturn(server);
+
+        User user = new User();
+        user.setUserName("Test User");
+        when(userDao.get(any())).thenReturn(user);
+
+        Group group = new Group();
+        group.setName("Test Group");
+        when(groupDao.get(any())).thenReturn(group);
     }
 
     @Test
     public void testGetList() {
         List<Reservation> list = new ArrayList<Reservation>();
         list.add(createReservation());
-      
-        when(reservationDao.list()).thenReturn(list);        
-        
+
+        when(reservationDao.list()).thenReturn(list);
+
         try {
-        	final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			mockMvc.perform(get("/api/reservations"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(1)))
-			.andExpect(jsonPath("$[0].name", is("Test")))
-			.andExpect(jsonPath("$[0].approved", is(true)))
-			.andExpect(jsonPath("$[0].owner_name", is("Test User")))
-			.andExpect(jsonPath("$[0].server_name", is("Test Server")))
-			.andExpect(jsonPath("$[0].start_date", is(df.format(0100L))))
-			.andExpect(jsonPath("$[0].end_date", is(df.format(0300L))));
-		} catch (Exception e) {
-			Assert.fail("testGetList failed with error:"+e.getLocalizedMessage());
-		}
+            final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            mockMvc.perform(get("/api/reservations")).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].name", is("Test"))).andExpect(jsonPath("$[0].approved", is(true)))
+                    .andExpect(jsonPath("$[0].owner_name", is("Test User")))
+                    .andExpect(jsonPath("$[0].server_name", is("Test Server")))
+                    .andExpect(jsonPath("$[0].start_date", is(df.format(0100L))))
+                    .andExpect(jsonPath("$[0].end_date", is(df.format(0300L))));
+        } catch (Exception e) {
+            Assert.fail("testGetList failed with error:" + e.getLocalizedMessage());
+        }
 
     }
-    
+
     @Test
     public void testGetById() {
         Reservation reservation = createReservation();
         when(reservationDao.get(any())).thenReturn(reservation);
 
         try {
-        	final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			mockMvc.perform(get("/api/reservations/{id}", reservation.getId()))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.name", is("Test")))
-			.andExpect(jsonPath("$.approved", is(true)))
-			.andExpect(jsonPath("$.owner_name", is("Test User")))
-			.andExpect(jsonPath("$.server_name", is("Test Server")))
-			.andExpect(jsonPath("$.start_date", is(df.format(0100L))))
-			.andExpect(jsonPath("$.end_date", is(df.format(0300L))));
-		} catch (Exception e) {
-			Assert.fail("testGetList failed with error:"+e.getLocalizedMessage());
-		}
+            final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            mockMvc.perform(get("/api/reservations/{id}", reservation.getId())).andExpect(status().isOk())
+                    .andExpect(jsonPath("$.name", is("Test"))).andExpect(jsonPath("$.approved", is(true)))
+                    .andExpect(jsonPath("$.owner_name", is("Test User")))
+                    .andExpect(jsonPath("$.server_name", is("Test Server")))
+                    .andExpect(jsonPath("$.start_date", is(df.format(0100L))))
+                    .andExpect(jsonPath("$.end_date", is(df.format(0300L))));
+        } catch (Exception e) {
+            Assert.fail("testGetList failed with error:" + e.getLocalizedMessage());
+        }
 
     }
 
     @Test
     public void testCreate() throws Exception {
-        Mockito.doAnswer(new Answer<Object>(){
+        Mockito.doAnswer(new Answer<Object>() {
             @Override
-            public Object answer(InvocationOnMock invocation){
-               Object[] arguments = invocation.getArguments();
-               Reservation argument = (Reservation) arguments[0];
-               argument.setId(UUID.randomUUID());
-               return null;
+            public Object answer(InvocationOnMock invocation) {
+                Object[] arguments = invocation.getArguments();
+                Reservation argument = (Reservation) arguments[0];
+                argument.setId(UUID.randomUUID());
+                return null;
             }
-         }).when(reservationDao).save(any());
-        
+        }).when(reservationDao).save(any());
+
         final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
         Date startdate = formatter.parse("10/10/16");
         Date enddate = formatter.parse("10/10/16");
-        
+
         ReservationDto reservationDto = new ReservationDto();
         reservationDto.setName("Test");
         reservationDto.setServerName("Test Server");
         reservationDto.setStartDate(df.format(startdate));
         reservationDto.setEndDate(df.format(enddate));
-        
-        mockMvc.perform(post("/api/reservations").contentType("application/json").content(TestUtil.convertObjectToJsonBytes(reservationDto)))
-		.andExpect(status().isOk())
-		.andExpect(jsonPath("$.name", is("Test")))
-		.andExpect(jsonPath("$.approved", is(false)))
-		.andExpect(jsonPath("$.owner_name", is("Test User")))
-		.andExpect(jsonPath("$.server_name", is("Test Server")))
-		.andExpect(jsonPath("$.start_date", is(df.format(startdate)+"T00:00:00.000Z")))
-		.andExpect(jsonPath("$.end_date", is(df.format(enddate)+"T00:00:00.000Z")));
+
+        mockMvc.perform(
+                post("/api/reservations").contentType("application/json").content(
+                        TestUtil.convertObjectToJsonBytes(reservationDto))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Test"))).andExpect(jsonPath("$.approved", is(false)))
+                .andExpect(jsonPath("$.owner_name", is("Test User")))
+                .andExpect(jsonPath("$.server_name", is("Test Server")))
+                .andExpect(jsonPath("$.start_date", is(df.format(startdate) + "T00:00:00.000Z")))
+                .andExpect(jsonPath("$.end_date", is(df.format(enddate) + "T00:00:00.000Z")));
     }
-    
+
     @Test
     public void testUpdate() throws Exception {
-    	Reservation reservation = createReservation();
-    			
+        Reservation reservation = createReservation();
+
         when(reservationDao.get(any())).thenReturn(reservation);
 
         final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
         Date startdate = formatter.parse("10/10/16");
         Date enddate = formatter.parse("10/10/16");
-        
+
         ReservationDto reservationDto = new ReservationDto();
         reservationDto.setName("Test");
         reservationDto.setServerName("Test Server");
         reservationDto.setStartDate(df.format(startdate));
         reservationDto.setEndDate(df.format(enddate));
         reservationDto.setApproved(true);
-        
-        mockMvc.perform(put("/api/reservations/{id}",reservation.getId()).contentType("application/json").content(TestUtil.convertObjectToJsonBytes(reservationDto)))
-		.andExpect(status().isOk())
-		.andExpect(jsonPath("$.name", is("Test")))
-		.andExpect(jsonPath("$.approved", is(true)))
-		.andExpect(jsonPath("$.owner_name", is("Test User")))
-		.andExpect(jsonPath("$.server_name", is("Test Server")))
-		.andExpect(jsonPath("$.start_date", is(df.format(startdate)+"T00:00:00.000Z")))
-		.andExpect(jsonPath("$.end_date", is(df.format(enddate)+"T00:00:00.000Z")));
+
+        mockMvc.perform(
+                put("/api/reservations/{id}", reservation.getId()).contentType("application/json").content(
+                        TestUtil.convertObjectToJsonBytes(reservationDto))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Test"))).andExpect(jsonPath("$.approved", is(true)))
+                .andExpect(jsonPath("$.owner_name", is("Test User")))
+                .andExpect(jsonPath("$.server_name", is("Test Server")))
+                .andExpect(jsonPath("$.start_date", is(df.format(startdate) + "T00:00:00.000Z")))
+                .andExpect(jsonPath("$.end_date", is(df.format(enddate) + "T00:00:00.000Z")));
     }
-    
+
     @Test
     public void testDelete() throws Exception {
-    	Reservation reservation = createReservation();
-    	when(reservationDao.get(any())).thenReturn(reservation);
-        mockMvc.perform(delete("/api/reservations/{id}",reservation.getId()))
-		.andExpect(status().isOk());
+        Reservation reservation = createReservation();
+        when(reservationDao.get(any())).thenReturn(reservation);
+        mockMvc.perform(delete("/api/reservations/{id}", reservation.getId())).andExpect(status().isOk());
     }
-    
-    private Reservation createReservation(){
-    	Reservation reservation = new Reservation();
-    	reservation.setId(UUID.randomUUID());
+
+    private Reservation createReservation() {
+        Reservation reservation = new Reservation();
+        reservation.setId(UUID.randomUUID());
         reservation.setName("Test");
         reservation.setCreatedTimestamp(0200L);
         reservation.setDataCenterId(UUID.randomUUID());

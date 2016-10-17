@@ -1,11 +1,9 @@
 package com.vmware.pso.samples.services.reservation;
 
-
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,50 +25,44 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.vmware.pso.samples.core.dao.UserDao;
-import com.vmware.pso.samples.core.dto.UpdaterDto;
 import com.vmware.pso.samples.core.model.User;
-import com.vmware.pso.samples.services.reservation.controller.UpdatersController;
 import com.vmware.pso.samples.services.reservation.controller.UsersController;
-import com.vmware.pso.samples.services.reservation.updater.ApprovalScheduledExecutor;
-import com.vmware.pso.samples.services.util.TestUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={ReservationApplication.class})
+@ContextConfiguration(classes = { ReservationApplication.class })
 @WebAppConfiguration
 public class UsersControllerTest {
 
-	@Mock
-	private UserDao userDao;
-	
+    @Mock
+    private UserDao userDao;
+
     @InjectMocks
     private UsersController usersController;
-    
 
     MockMvc mockMvc;
+
     @Before
     public void setUp() {
-    	 MockitoAnnotations.initMocks(this);  	 
-         mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
+        MockitoAnnotations.initMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
     }
 
     @Test
-    public void testGetList() {    
-    	User user = new User();
-    	user.setId(UUID.randomUUID());
+    public void testGetList() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
         user.setUserName("Test User");
         List<User> users = new ArrayList<User>();
         users.add(user);
-        when(userDao.list()).thenReturn(users); 
+        when(userDao.list()).thenReturn(users);
         try {
-			mockMvc.perform(get("/api/users"))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$", hasSize(1)))
-			.andExpect(jsonPath("$[0].id", is(user.getId().toString())))
-			.andExpect(jsonPath("$[0].name", is(user.getUserName())));
-		} catch (Exception e) {
-			Assert.fail("testGetList failed with error:"+e.getLocalizedMessage());
-		}
+            mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$[0].id", is(user.getId().toString())))
+                    .andExpect(jsonPath("$[0].name", is(user.getUserName())));
+        } catch (Exception e) {
+            Assert.fail("testGetList failed with error:" + e.getLocalizedMessage());
+        }
 
     }
-  
+
 }
