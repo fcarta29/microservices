@@ -42,7 +42,8 @@ public class JournalRedisConfig {
         return factory;
     }
 
-    @Bean(name = "redisTemplate")
+    @Bean
+    @Qualifier("redisTemplate")
     protected RedisTemplate<String, String> redisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
         final RedisTemplate<String, String> redisTemplate = new RedisTemplate<String, String>();
         redisTemplate.setConnectionFactory(jedisConnectionFactory);

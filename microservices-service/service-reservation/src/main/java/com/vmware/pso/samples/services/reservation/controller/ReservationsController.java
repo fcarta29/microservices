@@ -77,8 +77,7 @@ public class ReservationsController extends AbstractReservationController<Reserv
         reservation.setStatus(Status.WAITING);
         reservationDao.save(reservation);
 
-        // schedule reservation for approval
-        final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(reservation);
+        // queue the reservation request to the journal topics
         final TopicDto topicDto = new TopicDto();
         final Group group = groupDao.get(reservation.getGroupId());
         topicDto.setTopic(group.getName()); // using group name here because testing uses that as its topic
@@ -99,9 +98,9 @@ public class ReservationsController extends AbstractReservationController<Reserv
         persistedReservation.setModifiedTimestamp(System.currentTimeMillis());
         reservationDao.save(persistedReservation);
 
-        // schedule reservation for approval only if waiting
+        // schedule reservation for approval only if it was already waiting
         if (Status.WAITING.equals(persistedReservation.getStatus())) {
-            final UUID approvalId = approvalScheduledExecutor.scheduleReservationForApproval(persistedReservation);
+            // queue the reservation request to the journal topics
             final TopicDto topicDto = new TopicDto();
             final Group group = groupDao.get(reservation.getGroupId());
             topicDto.setTopic(group.getName()); // using group name here because testing uses that as its topic
