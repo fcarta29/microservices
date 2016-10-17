@@ -1,8 +1,6 @@
 package com.vmware.pso.samples.services.reservation.updater;
 
-import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -10,8 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-
-import com.vmware.pso.samples.core.model.Reservation;
 
 public class ApprovalScheduledExecutor extends ScheduledThreadPoolExecutor {
 
@@ -27,17 +23,6 @@ public class ApprovalScheduledExecutor extends ScheduledThreadPoolExecutor {
 
     public ApprovalScheduledExecutor(final int corePoolSize) {
         super(corePoolSize);
-    }
-
-    // dynamically load new task from context and schedule reservation for approval
-    public UUID scheduleReservationForApproval(final Reservation reservation) {
-        final ApprovalTask approvalTask = ((ApprovalTask) context.getBean("approvalTask", reservation.getId()));
-
-        LOG.debug("Scheduling approval : " + approvalTask.getApprovalId());
-
-        schedule(approvalTask, 5, TimeUnit.SECONDS);
-
-        return approvalTask.getApprovalId();
     }
 
     @Override

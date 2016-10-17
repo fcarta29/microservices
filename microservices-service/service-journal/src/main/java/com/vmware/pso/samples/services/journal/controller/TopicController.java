@@ -43,6 +43,7 @@ public class TopicController {
 
             final TopicDto topicDto = new TopicDto();
             topicDto.setId(String.valueOf(fakeId.incrementAndGet()));
+            topicDto.setTopic(topic);
             topicDto.setMessage(messages.get(0));
             return topicDto;
         }
@@ -55,6 +56,7 @@ public class TopicController {
 
         final TopicDto topicDto = new TopicDto();
         topicDto.setId(String.valueOf(fakeId.incrementAndGet()));
+        topicDto.setTopic(topic);
         topicDto.setMessage(message);
         return topicDto;
     }
