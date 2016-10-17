@@ -24,7 +24,7 @@ public class TopicsController {
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     final public @ResponseBody List<String> get() {
         final List<String> topics = new ArrayList<String>();
-        topics.addAll(redisTemplate.opsForZSet().range(TOPICS_KEY, 1, Long.MAX_VALUE));
+        topics.addAll(redisTemplate.opsForZSet().rangeByScore(TOPICS_KEY, 1, Long.MAX_VALUE));
         return topics;
     }
 }

@@ -7,12 +7,14 @@
         $("#startDatepicker").datepicker({
             dateFormat: "yy-mm-dd",
             changeMonth: true,
-            changeYear: true
+            changeYear: true,
+            autoSize: true
         });
         $("#endDatepicker").datepicker({
             dateFormat: "yy-mm-dd",
             changeMonth: true,
-            changeYear: true
+            changeYear: true,
+            autoSize: true
         });
 
         $('#calendarDiv').fullCalendar({

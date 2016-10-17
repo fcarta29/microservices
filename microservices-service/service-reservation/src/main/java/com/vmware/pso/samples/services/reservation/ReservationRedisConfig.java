@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,6 +14,7 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.vmware.pso.samples.core.dto.ErrorDto;
 import com.vmware.pso.samples.core.dto.ReservationDto;
@@ -27,11 +27,6 @@ public class ReservationRedisConfig {
 
     private @Value("${redis.host-name}") String redisHostName;
     private @Value("${redis.port}") int redisPort;
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
@@ -70,6 +65,18 @@ public class ReservationRedisConfig {
         topicRedisTemplate.setDefaultSerializer(new Jackson2JsonRedisSerializer<TopicDto>(TopicDto.class));
         topicRedisTemplate.afterPropertiesSet();
         return topicRedisTemplate;
+    }
+
+    @Bean
+    @Qualifier("journalRedisTemplate")
+    protected RedisTemplate<String, String> journalRedisTemplate(final JedisConnectionFactory jedisConnectionFactory) {
+        final RedisTemplate<String, String> journalRedisTemplate = new RedisTemplate<String, String>();
+        journalRedisTemplate.setConnectionFactory(jedisConnectionFactory);
+        journalRedisTemplate.setKeySerializer(new StringRedisSerializer());
+        journalRedisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        journalRedisTemplate.setValueSerializer(new StringRedisSerializer());
+        journalRedisTemplate.afterPropertiesSet();
+        return journalRedisTemplate;
     }
 
     @Bean
