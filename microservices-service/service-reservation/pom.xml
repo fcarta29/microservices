@@ -68,7 +68,14 @@
       <groupId>com.orange.redis-embedded</groupId>
       <artifactId>embedded-redis</artifactId>
     </dependency>   
-        
+    <dependency>
+	    <groupId>org.mockito</groupId>
+	    <artifactId>mockito-core</artifactId>
+	</dependency>
+    <dependency>
+     	<groupId>com.jayway.jsonpath</groupId>
+    	<artifactId>json-path</artifactId>
+ 	</dependency>
     <!-- Swagger TODO[fcarta]: extract these up to main project -->
     <dependency>
       <groupId>io.springfox</groupId>
